@@ -690,6 +690,71 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Returns a list of supposedly stuck jobs.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b24a7412-4d2c-44e5-afd2-d5644e913adc",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									"    var jsonData = JSON.parse(responseBody).results;",
+									"    jsonData.forEach(function(entity){",
+									"        GetStuckDeliveryJob = {",
+									"            url: (pm.environment.get(\"OrderAPIHost\")+'/v1/deliveryjobs/'+entity.jobId),",
+									"            method: 'GET'",
+									"        };",
+									"        pm.sendRequest(GetStuckDeliveryJob, function (err, res) ",
+									"        {",
+									"            pm.test(\"Validate job by jobId \"+ entity.jobId, function () {",
+									"            var jsonData = pm.response.json();",
+									"            pm.expect( res.json().id).to.eql(entity.jobId);",
+									"               });",
+									"        });",
+									"       ",
+									"   });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/stuck?maxIdleMinutes=60",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"stuck"
+							],
+							"query": [
+								{
+									"key": "maxIdleMinutes",
+									"value": "60"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
