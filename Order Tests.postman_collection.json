@@ -649,6 +649,47 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Performs consistency check on all delivery jobs.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3627e6b0-b33a-49cd-9a39-fa287e305dcd",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/checkAll?fullScan=false",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"checkAll"
+							],
+							"query": [
+								{
+									"key": "fullScan",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
