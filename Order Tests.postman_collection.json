@@ -582,7 +582,34 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5f754571-3c7d-4018-9c70-bfca1af527d1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e0c29107-049c-4d6b-91ca-ca738e1daf0e",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "DeliveryJobs",
+			"item": [
 				{
 					"name": "Returns all jobs currently blocked by do-not-deliver-before dates.",
 					"event": [
@@ -622,28 +649,6 @@
 						}
 					},
 					"response": []
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "5f754571-3c7d-4018-9c70-bfca1af527d1",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "e0c29107-049c-4d6b-91ca-ca738e1daf0e",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				}
 			]
 		}
