@@ -862,20 +862,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{OrderAPIHost}}/v1/orders/:id",
+							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}",
 							"host": [
 								"{{OrderAPIHost}}"
 							],
 							"path": [
 								"v1",
 								"orders",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{NewOrderID}}"
-								}
+								"{{NewOrderID}}"
 							]
 						}
 					},
@@ -1113,26 +1107,16 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{OrderAPIHost}}/v1/orders/:id/history/:version",
+							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}/history/{{OrderVersion}}",
 							"host": [
 								"{{OrderAPIHost}}"
 							],
 							"path": [
 								"v1",
 								"orders",
-								":id",
+								"{{NewOrderID}}",
 								"history",
-								":version"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{NewOrderID}}"
-								},
-								{
-									"key": "version",
-									"value": "{{OrderVersion}}"
-								}
+								"{{OrderVersion}}"
 							]
 						}
 					},
@@ -1180,14 +1164,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{OrderAPIHost}}/v1/orders/:id/history?take=500",
+							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}/history?take=500",
 							"host": [
 								"{{OrderAPIHost}}"
 							],
 							"path": [
 								"v1",
 								"orders",
-								":id",
+								"{{NewOrderID}}",
 								"history"
 							],
 							"query": [
@@ -1199,12 +1183,6 @@
 								{
 									"key": "take",
 									"value": "500"
-								}
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{NewOrderID}}"
 								}
 							]
 						}
@@ -1393,14 +1371,14 @@
 						],
 						"body": {},
 						"url": {
-							"raw": "{{OrderAPIHost}}/v1/orders/:id?cancellationReason=INVALID_ORDER_DATA",
+							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}?cancellationReason=INVALID_ORDER_DATA",
 							"host": [
 								"{{OrderAPIHost}}"
 							],
 							"path": [
 								"v1",
 								"orders",
-								":id"
+								"{{NewOrderID}}"
 							],
 							"query": [
 								{
@@ -1411,12 +1389,6 @@
 									"key": "cancellationDetails",
 									"value": "{{cancellationDetails}}",
 									"disabled": true
-								}
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{NewOrderID}}"
 								}
 							]
 						}
