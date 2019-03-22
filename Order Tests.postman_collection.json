@@ -2405,6 +2405,12 @@
 													"tests[\"title VersionName check\"] = QCJob.titleVersionName !== null;",
 													"console.log(\"QC Job - titleVersionName:\"+QCJob.titleVersionName);",
 													"tests[\"due check\"] = QCJob.due !== null; ",
+													"}",
+													"else",
+													"{",
+													"    console.log(\"Stop Tests\");",
+													"    postman.setNextRequest(null);",
+													"    ",
 													"}"
 												],
 												"type": "text/javascript"
