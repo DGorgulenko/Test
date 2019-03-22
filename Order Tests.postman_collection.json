@@ -608,6 +608,386 @@
 			]
 		},
 		{
+			"name": "LicensingJobs",
+			"item": [
+				{
+					"name": "Creates new licensing job using provided data. Skip no tests",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aadc5ad7-8c09-42cf-aa6d-9748a19088eb",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query for licensing jobs.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "79bc6039-a1fe-4646-b6b8-993854d1e02d",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var resultCount = parseInt(pm.environment.get(\"PageSize\"));",
+									"//Check that all required statuses are present",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//check Jobs count",
+									"var Results = jsonData.results;",
+									"if (jsonData.totalCount >= resultCount)  tests[\"Check Page size\"] = Results.length === resultCount;  ",
+									"",
+									"//check that license job is license job =)",
+									"for (var count = 0; count < Results.length; count++)",
+									"{",
+									"    var LicenseJob = Results[count];",
+									"    tests[\"Validate license \"+count] = LicenseJob.urn.includes(\"licensingjob\");",
+									"}",
+									"",
+									"pm.environment.set(\"License\", Results[0]);",
+									"pm.environment.set(\"LicenseVersion\", Results[0].version-1);",
+									"pm.environment.set(\"LicenseId\", Results[0].id);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": {{PageSize}},\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs/find",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns full information about specified licensing job.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4c2d83e4-9e2b-4408-8a00-df0105997bf7",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a989a54-e9e6-4589-97d5-22f82196502a",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									"var jsonData = JSON.parse(responseBody);",
+									"var FindLicense = pm.environment.get(\"License\");",
+									"var properties = Object.getOwnPropertyNames(FindLicense);",
+									"for (var count = 0; count < properties.length; count++)",
+									"{",
+									"    var property = properties[count];",
+									"    tests[\"Validate property: \"+ property] = FindLicense.property == jsonData.property;",
+									"}",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs/{{LicenseId}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs",
+								"{{LicenseId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns entity change for specified licensing job and entity version.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ab9250cb-6d69-424a-b468-d025bfd64a07",
+								"exec": [
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "de0f5592-230d-4f0d-9d59-0aa4b366c69e",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"if (responseCode.code === 200)",
+									"{",
+									"var baseVersion = parseInt(pm.environment.get(\"LicenseVersion\"));",
+									"var LicenseId = pm.environment.get(\"LicenseId\");",
+									"var jsonData = JSON.parse(responseBody);",
+									"var entity = jsonData.entity;",
+									"",
+									"",
+									"tests[\"BaseVersion is correct\"] = jsonData.baseVersion === baseVersion;",
+									"tests[\"Id is correct\"] = jsonData.id == (LicenseId + '.'+ baseVersion);",
+									"tests[\"Entity Id is correct\"] = entity.Id == LicenseId;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs/{{LicenseId}}/history/{{LicenseVersion}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs",
+								"{{LicenseId}}",
+								"history",
+								"{{LicenseVersion}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns list of licensing jobs for order.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "56f26e51-057d-463d-b7c1-befabba88d8f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a94ccfb0-81fe-4439-b37e-ab97b5437714",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs/fororder/{{LicenseOrderId}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs",
+								"fororder",
+								"{{LicenseOrderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns a range of changes applied to specified licensing job.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d1f90f48-c662-43bc-974f-3c58abed3d2a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "5596740e-5513-4e19-ad51-74d16d9bc094",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"if (responseCode.code === 200)",
+									"{",
+									"var baseVersion = parseInt(pm.environment.get(\"LicenseVersion\"));",
+									"var LicenseId = pm.environment.get(\"LicenseId\");",
+									"var LicenseOrderId = pm.environment.get(\"LicenseOrderId\");",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"",
+									"for (var count = 0; count < jsonData.totalCount; count++)",
+									"{",
+									"    var entity = jsonData.results[count].entity;",
+									"    tests[\"Validate record id for record \"+ count] = jsonData.results[count].id == (LicenseId + '.'+ count);",
+									"    tests[\"Validate entity id for record \"+ count] = entity.Id == LicenseId;",
+									"    tests[\"Validate entity order id for record \"+ count] = entity.OrderId == LicenseOrderId;",
+									"}",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs/{{LicenseId}}/history?take=500",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs",
+								"{{LicenseId}}",
+								"history"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "{{skip}}",
+									"disabled": true
+								},
+								{
+									"key": "take",
+									"value": "500"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "DeliveryJobs",
 			"item": [
 				{
@@ -685,71 +1065,6 @@
 								{
 									"key": "fullScan",
 									"value": "false"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Returns a list of supposedly stuck jobs.",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b24a7412-4d2c-44e5-afd2-d5644e913adc",
-								"exec": [
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"",
-									"if (responseCode.code === 200)",
-									"{",
-									"    var jsonData = JSON.parse(responseBody).results;",
-									"    jsonData.forEach(function(entity){",
-									"        GetStuckDeliveryJob = {",
-									"            url: (pm.environment.get(\"OrderAPIHost\")+'/v1/deliveryjobs/'+entity.jobId),",
-									"            method: 'GET'",
-									"        };",
-									"        pm.sendRequest(GetStuckDeliveryJob, function (err, res) ",
-									"        {",
-									"            pm.test(\"Validate job by jobId \"+ entity.jobId, function () {",
-									"            var jsonData = pm.response.json();",
-									"            pm.expect( res.json().id).to.eql(entity.jobId);",
-									"               });",
-									"        });",
-									"       ",
-									"   });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/stuck?maxIdleMinutes=60",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"deliveryjobs",
-								"stuck"
-							],
-							"query": [
-								{
-									"key": "maxIdleMinutes",
-									"value": "60"
 								}
 							]
 						}
