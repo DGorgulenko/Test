@@ -6,446 +6,10 @@
 	},
 	"item": [
 		{
-			"name": "Tasks Copy",
-			"item": [
-				{
-					"name": "ONEORDRS-501",
-					"item": [
-						{
-							"name": "Compliance Part",
-							"item": [
-								{
-									"name": "ONEORDRS-501 Create Order with Compliance Job",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "abfe0634-cee3-4b05-8651-35e77f3c1192",
-												"exec": [
-													"//create a complieance job",
-													"function makeid() {",
-													"  var text = \"\";",
-													"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
-													"",
-													"  for (var i = 0; i < 16; i++)",
-													"    text += possible.charAt(Math.floor(Math.random() * possible.length));",
-													"",
-													"  return text;",
-													"}",
-													"",
-													"var DueDate = new Date();",
-													"var DNDBDate = new Date();",
-													"var ShippingDate = new Date();",
-													"var AvaliabilityStart = new Date();",
-													"var AvaliabilityEnd = new Date();",
-													"var ExternalReference = makeid();",
-													"",
-													"DueDate.setMinutes(DueDate.getMinutes() + 50); // 5 min",
-													"DNDBDate.setMinutes(DNDBDate.getMinutes() + 10); // 10 min",
-													"ShippingDate.setDate(ShippingDate.getDate() + 1); // 1 day",
-													"AvaliabilityStart.setHours(AvaliabilityStart.getHours() + 2); // 2 hours",
-													"AvaliabilityEnd.setMonth(AvaliabilityEnd.getMonth() + 1); // 1 month",
-													"",
-													"var TitleId = pm.environment.get(\"501_TitleId\");",
-													"console.log(TitleId);",
-													"var TitleVersion = pm.environment.get(\"501_TitleVersion\");",
-													"console.log(TitleVersion);",
-													"var CustomerPackageProfile = pm.environment.get(\"501_CustomerPackageProfile\");",
-													"console.log(CustomerPackageProfile);",
-													"",
-													"var json = '{\"description\":\"Postman 501 Retest\",\"customer\":\"e3b59a42\",\"originalDue\":\"'+DueDate.toISOString()+'\",\"originalDoNotDeliverBefore\":\"'+DNDBDate.toISOString()+'\",\"externalReference\":\"'+ExternalReference+'\",\"complianceJobs\":[{\"title\":\"Sample Title\",\"customer\":\"e3b59a42\",\"titleId\":\"'+TitleId+'\",\"titleVersion\":\"'+TitleVersion+'\",\"customerPackageProfile\":\"'+CustomerPackageProfile+'\",\"due\":\"'+DueDate.toISOString()+'\"}]}';",
-													"console.log(json);",
-													"pm.environment.set(\"501_OrderCreateRequest\", json);"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "7adf5d02-e300-409b-a7aa-7df9d45b7d1b",
-												"exec": [
-													"tests[\"Status code is 201\"] = responseCode.code === 201;",
-													"//Check each property",
-													"function pausecomp(millis)",
-													" {",
-													"  var date = new Date();",
-													"  var curDate = null;",
-													"  do { curDate = new Date(); }",
-													"  while(curDate-date < millis);",
-													"}",
-													"",
-													"",
-													"if (responseCode.code === 201)",
-													"{",
-													" var jsonData = JSON.parse(responseBody);",
-													" pm.environment.set(\"501_NewOrderID\", jsonData.value);",
-													" tests[\"Has error check\"] = jsonData.hasErrors === false;",
-													" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0; ",
-													" pausecomp(5000);",
-													"}",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{{501_OrderCreateRequest}}"
-										},
-										"url": {
-											"raw": "{{OrderAPIHost}}/v1/orders",
-											"host": [
-												"{{OrderAPIHost}}"
-											],
-											"path": [
-												"v1",
-												"orders"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "ONEORDRS-501 Check Compliance Job byOrderID",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "460a1f73-d823-4d5a-8ac4-c24edf5a7697",
-												"exec": [
-													"//Check Status Code",
-													"tests[\"Status code is 200\"] = responseCode.code === 200;",
-													"//Check each property",
-													"if (responseCode.code === 200)",
-													"{",
-													"var ComplianceJob = JSON.parse(responseBody)[0];",
-													"//console.log(ComplianceJob);",
-													"pm.environment.set(\"501_ComplianceJobID\", ComplianceJob.id);",
-													"tests[\"Customer Package Profile check\"] = ComplianceJob.customerPackageProfile !== null;",
-													"tests[\"title Name check\"] = ComplianceJob.titleName !== null;",
-													"console.log(\"CJob - titleName:\"+ComplianceJob.titleName);",
-													"tests[\"title VersionName check\"] = ComplianceJob.titleVersionName !== null;",
-													"console.log(\"CJob - titleVersionName:\"+ComplianceJob.titleVersionName);",
-													"tests[\"due check\"] = ComplianceJob.due !== null; ",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{OrderAPIHost}}/v1/compliancejobs/fororder/{{501_NewOrderID}}",
-											"host": [
-												"{{OrderAPIHost}}"
-											],
-											"path": [
-												"v1",
-												"compliancejobs",
-												"fororder",
-												"{{501_NewOrderID}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "ONEORDRS-501 Check Compliance Job by JobID",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "669ddabc-babb-4221-b247-a0031cc09ce9",
-												"exec": [
-													"//Check Status Code",
-													"tests[\"Status code is 200\"] = responseCode.code === 200;",
-													"//Check each property",
-													"if (responseCode.code === 200)",
-													"{",
-													"var ComplianceJob = JSON.parse(responseBody);",
-													"tests[\"Customer Package Profile check\"] = ComplianceJob.customerPackageProfile !== null;",
-													"tests[\"title Name check\"] = ComplianceJob.titleName !== null;",
-													"console.log(\"CJob - titleName:\"+ComplianceJob.titleName);",
-													"tests[\"title VersionName check\"] = ComplianceJob.titleVersionName !== null;",
-													"console.log(\"CJob - titleVersionName:\"+ComplianceJob.titleVersionName);",
-													"tests[\"due check\"] = ComplianceJob.due !== null; ",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{OrderAPIHost}}/v1/compliancejobs/{{501_ComplianceJobID}}",
-											"host": [
-												"{{OrderAPIHost}}"
-											],
-											"path": [
-												"v1",
-												"compliancejobs",
-												"{{501_ComplianceJobID}}"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"_postman_isSubFolder": true
-						},
-						{
-							"name": "QC Part",
-							"item": [
-								{
-									"name": "ONEORDRS-501 Create Order with QC Job",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "abfe0634-cee3-4b05-8651-35e77f3c1192",
-												"exec": [
-													"//create a complieance job",
-													"function makeid() {",
-													"  var text = \"\";",
-													"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
-													"",
-													"  for (var i = 0; i < 16; i++)",
-													"    text += possible.charAt(Math.floor(Math.random() * possible.length));",
-													"",
-													"  return text;",
-													"}",
-													"",
-													"var DueDate = new Date();",
-													"var DNDBDate = new Date();",
-													"var ShippingDate = new Date();",
-													"var AvaliabilityStart = new Date();",
-													"var AvaliabilityEnd = new Date();",
-													"var ExternalReference = makeid();",
-													"",
-													"DueDate.setMinutes(DueDate.getMinutes() + 50); // 5 min",
-													"DNDBDate.setMinutes(DNDBDate.getMinutes() + 10); // 10 min",
-													"ShippingDate.setDate(ShippingDate.getDate() + 1); // 1 day",
-													"AvaliabilityStart.setHours(AvaliabilityStart.getHours() + 2); // 2 hours",
-													"AvaliabilityEnd.setMonth(AvaliabilityEnd.getMonth() + 1); // 1 month",
-													"",
-													"var TitleId = pm.environment.get(\"501_TitleId_QC\");",
-													"console.log(TitleId);",
-													"var TitleVersion = pm.environment.get(\"501_TitleVersion_QC\");",
-													"console.log(TitleVersion);",
-													"var CustomerPackageProfile = pm.environment.get(\"501_CustomerPackageProfile_QC\");",
-													"console.log(CustomerPackageProfile);",
-													"var SourceAssetId = pm.environment.get(\"501_SourceAssetId_QC\");",
-													"",
-													"var json = '{\"description\":\"Postman 501 Retest QC\",\"customer\":\"e3b59a42\",\"originalDue\":\"'+DueDate.toISOString()+'\",\"originalDoNotDeliverBefore\":\"'+DNDBDate.toISOString()+'\",\"externalReference\":\"'+ExternalReference+'\",\"qcJobs\":[{\"customer\":\"e3b59a42\",\"titleId\":\"'+TitleId+'\",\"titleVersion\":\"'+TitleVersion+'\",\"sourceAssetId\":\"'+SourceAssetId+'\",\"customerPackageProfile\":\"'+ CustomerPackageProfile+'\",\"due\":\"'+DueDate.toISOString()+'\"}]}';",
-													"console.log(json);",
-													"pm.environment.set(\"501_OrderCreateRequest\", json);"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"id": "7adf5d02-e300-409b-a7aa-7df9d45b7d1b",
-												"exec": [
-													"tests[\"Status code is 201\"] = responseCode.code === 201;",
-													"//Check each property",
-													"function pausecomp(millis)",
-													" {",
-													"  var date = new Date();",
-													"  var curDate = null;",
-													"  do { curDate = new Date(); }",
-													"  while(curDate-date < millis);",
-													"}",
-													"",
-													"",
-													"if (responseCode.code === 201)",
-													"{",
-													" var jsonData = JSON.parse(responseBody);",
-													" pm.environment.set(\"501_NewOrderID_QC\", jsonData.value);",
-													" tests[\"Has error check\"] = jsonData.hasErrors === false;",
-													" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0; ",
-													" pausecomp(5000);",
-													"}",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{{501_OrderCreateRequest}}"
-										},
-										"url": {
-											"raw": "{{OrderAPIHost}}/v1/orders",
-											"host": [
-												"{{OrderAPIHost}}"
-											],
-											"path": [
-												"v1",
-												"orders"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "ONEORDRS-501 Check qc Job byOrderID",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "460a1f73-d823-4d5a-8ac4-c24edf5a7697",
-												"exec": [
-													"//Check Status Code",
-													"tests[\"Status code is 200\"] = responseCode.code === 200;",
-													"pm.environment.set(\"501_QCJobID\", \"\");",
-													"tests[\"Order has been found\"] = responseBody !== \"[]\";",
-													"//Check each property",
-													"if (responseCode.code === 200 && responseBody !== \"[]\")",
-													"{",
-													"var QCJob = JSON.parse(responseBody)[0];",
-													"console.log(responseBody);",
-													"pm.environment.set(\"501_QCJobID\", QCJob.id);",
-													"tests[\"Customer Package Profile check\"] = QCJob.customerPackageProfile !== null;",
-													"tests[\"title Name check\"] = QCJob.titleName !== null;",
-													"console.log(\"QC Job - titleName:\"+QCJob.titleName);",
-													"tests[\"title VersionName check\"] = QCJob.titleVersionName !== null;",
-													"console.log(\"QC Job - titleVersionName:\"+QCJob.titleVersionName);",
-													"tests[\"due check\"] = QCJob.due !== null; ",
-													"}",
-													"else",
-													"{",
-													"    console.log(\"Stop Tests\");",
-													"    postman.setNextRequest(null);",
-													"    ",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{OrderAPIHost}}/v1/qcjobs/fororder/{{501_NewOrderID_QC}}",
-											"host": [
-												"{{OrderAPIHost}}"
-											],
-											"path": [
-												"v1",
-												"qcjobs",
-												"fororder",
-												"{{501_NewOrderID_QC}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "ONEORDRS-501 Check qc Job by JobID",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "669ddabc-babb-4221-b247-a0031cc09ce9",
-												"exec": [
-													"//Check Status Code",
-													"tests[\"Status code is 200\"] = responseCode.code === 200;",
-													"tests[\"Order has been found\"] = pm.environment.get(\"501_QCJobID\") !== null;",
-													"//Check each property",
-													"if (responseCode.code === 200 && pm.environment.get(\"501_QCJobID\") !== null)",
-													"{",
-													"var QCJob = JSON.parse(responseBody);",
-													"",
-													"",
-													"tests[\"Customer Package Profile check\"] = QCJob.customerPackageProfile !== null;",
-													"tests[\"title Name check\"] = QCJob.titleName !== null;",
-													"console.log(\"QC Job - titleName:\"+QCJob.titleName);",
-													"tests[\"title VersionName check\"] = QCJob.titleVersionName !== null;",
-													"console.log(\"QC Job - titleVersionName:\"+QCJob.titleVersionName);",
-													"tests[\"due check\"] = QCJob.due !== null; ",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
-										"url": {
-											"raw": "{{OrderAPIHost}}/v1/qcjobs/{{501_QCJobID}}",
-											"host": [
-												"{{OrderAPIHost}}"
-											],
-											"path": [
-												"v1",
-												"qcjobs",
-												"{{501_QCJobID}}"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"_postman_isSubFolder": true
-						}
-					],
-					"description": "https://jira.d3nw.com/browse/ONEORDRS-501",
-					"_postman_isSubFolder": true
-				}
-			]
-		},
-		{
 			"name": "Const",
 			"item": [
 				{
-					"name": "Returns all possible statuses for delivery job.",
+					"name": "GET /v1/consts/deliveryjob/status",
 					"event": [
 						{
 							"listen": "test",
@@ -499,12 +63,13 @@
 								"deliveryjob",
 								"status"
 							]
-						}
+						},
+						"description": "Returns all possible statuses for delivery job."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible stages for delivery job.",
+					"name": "GET /v1/consts/deliveryjob/stage",
 					"event": [
 						{
 							"listen": "test",
@@ -558,12 +123,13 @@
 								"deliveryjob",
 								"stage"
 							]
-						}
+						},
+						"description": "Returns all possible stages for delivery job."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible cancellation reasons for order.",
+					"name": "GET /v1/consts/order/cancellationReason",
 					"event": [
 						{
 							"listen": "test",
@@ -610,7 +176,8 @@
 								"order",
 								"cancellationReason"
 							]
-						}
+						},
+						"description": "Returns all possible cancellation reasons for order."
 					},
 					"response": []
 				},
@@ -2207,6 +1774,442 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks Copy",
+			"item": [
+				{
+					"name": "ONEORDRS-501",
+					"item": [
+						{
+							"name": "Compliance Part",
+							"item": [
+								{
+									"name": "ONEORDRS-501 Create Order with Compliance Job",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "abfe0634-cee3-4b05-8651-35e77f3c1192",
+												"exec": [
+													"//create a complieance job",
+													"function makeid() {",
+													"  var text = \"\";",
+													"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+													"",
+													"  for (var i = 0; i < 16; i++)",
+													"    text += possible.charAt(Math.floor(Math.random() * possible.length));",
+													"",
+													"  return text;",
+													"}",
+													"",
+													"var DueDate = new Date();",
+													"var DNDBDate = new Date();",
+													"var ShippingDate = new Date();",
+													"var AvaliabilityStart = new Date();",
+													"var AvaliabilityEnd = new Date();",
+													"var ExternalReference = makeid();",
+													"",
+													"DueDate.setMinutes(DueDate.getMinutes() + 50); // 5 min",
+													"DNDBDate.setMinutes(DNDBDate.getMinutes() + 10); // 10 min",
+													"ShippingDate.setDate(ShippingDate.getDate() + 1); // 1 day",
+													"AvaliabilityStart.setHours(AvaliabilityStart.getHours() + 2); // 2 hours",
+													"AvaliabilityEnd.setMonth(AvaliabilityEnd.getMonth() + 1); // 1 month",
+													"",
+													"var TitleId = pm.environment.get(\"501_TitleId\");",
+													"console.log(TitleId);",
+													"var TitleVersion = pm.environment.get(\"501_TitleVersion\");",
+													"console.log(TitleVersion);",
+													"var CustomerPackageProfile = pm.environment.get(\"501_CustomerPackageProfile\");",
+													"console.log(CustomerPackageProfile);",
+													"",
+													"var json = '{\"description\":\"Postman 501 Retest\",\"customer\":\"e3b59a42\",\"originalDue\":\"'+DueDate.toISOString()+'\",\"originalDoNotDeliverBefore\":\"'+DNDBDate.toISOString()+'\",\"externalReference\":\"'+ExternalReference+'\",\"complianceJobs\":[{\"title\":\"Sample Title\",\"customer\":\"e3b59a42\",\"titleId\":\"'+TitleId+'\",\"titleVersion\":\"'+TitleVersion+'\",\"customerPackageProfile\":\"'+CustomerPackageProfile+'\",\"due\":\"'+DueDate.toISOString()+'\"}]}';",
+													"console.log(json);",
+													"pm.environment.set(\"501_OrderCreateRequest\", json);"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "7adf5d02-e300-409b-a7aa-7df9d45b7d1b",
+												"exec": [
+													"tests[\"Status code is 201\"] = responseCode.code === 201;",
+													"//Check each property",
+													"function pausecomp(millis)",
+													" {",
+													"  var date = new Date();",
+													"  var curDate = null;",
+													"  do { curDate = new Date(); }",
+													"  while(curDate-date < millis);",
+													"}",
+													"",
+													"",
+													"if (responseCode.code === 201)",
+													"{",
+													" var jsonData = JSON.parse(responseBody);",
+													" pm.environment.set(\"501_NewOrderID\", jsonData.value);",
+													" tests[\"Has error check\"] = jsonData.hasErrors === false;",
+													" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0; ",
+													" pausecomp(5000);",
+													"}",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{{501_OrderCreateRequest}}"
+										},
+										"url": {
+											"raw": "{{OrderAPIHost}}/v1/orders",
+											"host": [
+												"{{OrderAPIHost}}"
+											],
+											"path": [
+												"v1",
+												"orders"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ONEORDRS-501 Check Compliance Job byOrderID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "460a1f73-d823-4d5a-8ac4-c24edf5a7697",
+												"exec": [
+													"//Check Status Code",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"//Check each property",
+													"if (responseCode.code === 200)",
+													"{",
+													"var ComplianceJob = JSON.parse(responseBody)[0];",
+													"//console.log(ComplianceJob);",
+													"pm.environment.set(\"501_ComplianceJobID\", ComplianceJob.id);",
+													"tests[\"Customer Package Profile check\"] = ComplianceJob.customerPackageProfile !== null;",
+													"tests[\"title Name check\"] = ComplianceJob.titleName !== null;",
+													"console.log(\"CJob - titleName:\"+ComplianceJob.titleName);",
+													"tests[\"title VersionName check\"] = ComplianceJob.titleVersionName !== null;",
+													"console.log(\"CJob - titleVersionName:\"+ComplianceJob.titleVersionName);",
+													"tests[\"due check\"] = ComplianceJob.due !== null; ",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{OrderAPIHost}}/v1/compliancejobs/fororder/{{501_NewOrderID}}",
+											"host": [
+												"{{OrderAPIHost}}"
+											],
+											"path": [
+												"v1",
+												"compliancejobs",
+												"fororder",
+												"{{501_NewOrderID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ONEORDRS-501 Check Compliance Job by JobID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "669ddabc-babb-4221-b247-a0031cc09ce9",
+												"exec": [
+													"//Check Status Code",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"//Check each property",
+													"if (responseCode.code === 200)",
+													"{",
+													"var ComplianceJob = JSON.parse(responseBody);",
+													"tests[\"Customer Package Profile check\"] = ComplianceJob.customerPackageProfile !== null;",
+													"tests[\"title Name check\"] = ComplianceJob.titleName !== null;",
+													"console.log(\"CJob - titleName:\"+ComplianceJob.titleName);",
+													"tests[\"title VersionName check\"] = ComplianceJob.titleVersionName !== null;",
+													"console.log(\"CJob - titleVersionName:\"+ComplianceJob.titleVersionName);",
+													"tests[\"due check\"] = ComplianceJob.due !== null; ",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{OrderAPIHost}}/v1/compliancejobs/{{501_ComplianceJobID}}",
+											"host": [
+												"{{OrderAPIHost}}"
+											],
+											"path": [
+												"v1",
+												"compliancejobs",
+												"{{501_ComplianceJobID}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "QC Part",
+							"item": [
+								{
+									"name": "ONEORDRS-501 Create Order with QC Job",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "abfe0634-cee3-4b05-8651-35e77f3c1192",
+												"exec": [
+													"//create a complieance job",
+													"function makeid() {",
+													"  var text = \"\";",
+													"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+													"",
+													"  for (var i = 0; i < 16; i++)",
+													"    text += possible.charAt(Math.floor(Math.random() * possible.length));",
+													"",
+													"  return text;",
+													"}",
+													"",
+													"var DueDate = new Date();",
+													"var DNDBDate = new Date();",
+													"var ShippingDate = new Date();",
+													"var AvaliabilityStart = new Date();",
+													"var AvaliabilityEnd = new Date();",
+													"var ExternalReference = makeid();",
+													"",
+													"DueDate.setMinutes(DueDate.getMinutes() + 50); // 5 min",
+													"DNDBDate.setMinutes(DNDBDate.getMinutes() + 10); // 10 min",
+													"ShippingDate.setDate(ShippingDate.getDate() + 1); // 1 day",
+													"AvaliabilityStart.setHours(AvaliabilityStart.getHours() + 2); // 2 hours",
+													"AvaliabilityEnd.setMonth(AvaliabilityEnd.getMonth() + 1); // 1 month",
+													"",
+													"var TitleId = pm.environment.get(\"501_TitleId_QC\");",
+													"console.log(TitleId);",
+													"var TitleVersion = pm.environment.get(\"501_TitleVersion_QC\");",
+													"console.log(TitleVersion);",
+													"var CustomerPackageProfile = pm.environment.get(\"501_CustomerPackageProfile_QC\");",
+													"console.log(CustomerPackageProfile);",
+													"var SourceAssetId = pm.environment.get(\"501_SourceAssetId_QC\");",
+													"",
+													"var json = '{\"description\":\"Postman 501 Retest QC\",\"customer\":\"e3b59a42\",\"originalDue\":\"'+DueDate.toISOString()+'\",\"originalDoNotDeliverBefore\":\"'+DNDBDate.toISOString()+'\",\"externalReference\":\"'+ExternalReference+'\",\"qcJobs\":[{\"customer\":\"e3b59a42\",\"titleId\":\"'+TitleId+'\",\"titleVersion\":\"'+TitleVersion+'\",\"sourceAssetId\":\"'+SourceAssetId+'\",\"customerPackageProfile\":\"'+ CustomerPackageProfile+'\",\"due\":\"'+DueDate.toISOString()+'\"}]}';",
+													"console.log(json);",
+													"pm.environment.set(\"501_OrderCreateRequest\", json);"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "7adf5d02-e300-409b-a7aa-7df9d45b7d1b",
+												"exec": [
+													"tests[\"Status code is 201\"] = responseCode.code === 201;",
+													"//Check each property",
+													"function pausecomp(millis)",
+													" {",
+													"  var date = new Date();",
+													"  var curDate = null;",
+													"  do { curDate = new Date(); }",
+													"  while(curDate-date < millis);",
+													"}",
+													"",
+													"",
+													"if (responseCode.code === 201)",
+													"{",
+													" var jsonData = JSON.parse(responseBody);",
+													" pm.environment.set(\"501_NewOrderID_QC\", jsonData.value);",
+													" tests[\"Has error check\"] = jsonData.hasErrors === false;",
+													" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0; ",
+													" pausecomp(5000);",
+													"}",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{{501_OrderCreateRequest}}"
+										},
+										"url": {
+											"raw": "{{OrderAPIHost}}/v1/orders",
+											"host": [
+												"{{OrderAPIHost}}"
+											],
+											"path": [
+												"v1",
+												"orders"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ONEORDRS-501 Check qc Job byOrderID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "460a1f73-d823-4d5a-8ac4-c24edf5a7697",
+												"exec": [
+													"//Check Status Code",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"pm.environment.set(\"501_QCJobID\", \"\");",
+													"tests[\"Order has been found\"] = responseBody !== \"[]\";",
+													"//Check each property",
+													"if (responseCode.code === 200 && responseBody !== \"[]\")",
+													"{",
+													"var QCJob = JSON.parse(responseBody)[0];",
+													"console.log(responseBody);",
+													"pm.environment.set(\"501_QCJobID\", QCJob.id);",
+													"tests[\"Customer Package Profile check\"] = QCJob.customerPackageProfile !== null;",
+													"tests[\"title Name check\"] = QCJob.titleName !== null;",
+													"console.log(\"QC Job - titleName:\"+QCJob.titleName);",
+													"tests[\"title VersionName check\"] = QCJob.titleVersionName !== null;",
+													"console.log(\"QC Job - titleVersionName:\"+QCJob.titleVersionName);",
+													"tests[\"due check\"] = QCJob.due !== null; ",
+													"}",
+													"else",
+													"{",
+													"    console.log(\"Stop Tests\");",
+													"    postman.setNextRequest(null);",
+													"    ",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{OrderAPIHost}}/v1/qcjobs/fororder/{{501_NewOrderID_QC}}",
+											"host": [
+												"{{OrderAPIHost}}"
+											],
+											"path": [
+												"v1",
+												"qcjobs",
+												"fororder",
+												"{{501_NewOrderID_QC}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ONEORDRS-501 Check qc Job by JobID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "669ddabc-babb-4221-b247-a0031cc09ce9",
+												"exec": [
+													"//Check Status Code",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"tests[\"Order has been found\"] = pm.environment.get(\"501_QCJobID\") !== null;",
+													"//Check each property",
+													"if (responseCode.code === 200 && pm.environment.get(\"501_QCJobID\") !== null)",
+													"{",
+													"var QCJob = JSON.parse(responseBody);",
+													"",
+													"",
+													"tests[\"Customer Package Profile check\"] = QCJob.customerPackageProfile !== null;",
+													"tests[\"title Name check\"] = QCJob.titleName !== null;",
+													"console.log(\"QC Job - titleName:\"+QCJob.titleName);",
+													"tests[\"title VersionName check\"] = QCJob.titleVersionName !== null;",
+													"console.log(\"QC Job - titleVersionName:\"+QCJob.titleVersionName);",
+													"tests[\"due check\"] = QCJob.due !== null; ",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{OrderAPIHost}}/v1/qcjobs/{{501_QCJobID}}",
+											"host": [
+												"{{OrderAPIHost}}"
+											],
+											"path": [
+												"v1",
+												"qcjobs",
+												"{{501_QCJobID}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"description": "https://jira.d3nw.com/browse/ONEORDRS-501",
+					"_postman_isSubFolder": true
 				}
 			]
 		}
