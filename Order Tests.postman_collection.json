@@ -812,6 +812,98 @@
 					"response": []
 				},
 				{
+					"name": "Updates existing order with provided data.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e14b0b1e-2b04-4cc4-95fc-daa1e63dca86",
+								"exec": [
+									"function makeid() {",
+									"  var text = \"\";",
+									"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+									"",
+									"  for (var i = 0; i < 16; i++)",
+									"    text += possible.charAt(Math.floor(Math.random() * possible.length));",
+									"",
+									"  return text;",
+									"}",
+									"",
+									"var NewExternalReference = makeid();",
+									"pm.environment.set(\"ExternalReference\", NewExternalReference);",
+									"",
+									"var orderId = pm.environment.get(\"NewOrderID\");",
+									"var temp = pm.environment.get(\"OrderCreaterequest\");",
+									"var CreationRequest = JSON.parse(temp);",
+									"var OrderUpdateBody = '{   \"id\": \"'+orderId+'\",   \"version\": 4,   \"description\": \"'+CreationRequest.description+' Updated\",   \"billableCustomerId\": null,   \"externalReference\": \"'+NewExternalReference+'\" }';",
+									"pm.environment.set(\"OrderUpdateBody\", OrderUpdateBody);",
+									"",
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 5000);//wait 5 sec",
+									"console.log(\"Waiting Finished\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b3bf6609-4f3d-49aa-ac5a-3b3d962aaaaa",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"//Check each property",
+									"var id = pm.environment.get(\"NewOrderID\");",
+									"console.log(id);",
+									"if (responseCode.code === 200)",
+									"{",
+									"    var ActualOrderInfo;",
+									"    var json = JSON.parse(responseBody);",
+									"    tests[\"Response value check \"] = json.value === true;",
+									"    tests[\"Response validationMessages check \"] = json.validationMessages.length === 0;",
+									"    tests[\"Response hasErrors check \"] = json.hasErrors === false;",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{OrderUpdateBody}}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/orders",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Returns full information about order. Includes all associated jobs.",
 					"event": [
 						{
