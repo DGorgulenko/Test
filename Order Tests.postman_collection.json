@@ -857,12 +857,14 @@
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									"var jsonData = JSON.parse(responseBody);",
 									"//Check that all required statuses are present",
-									"tests[\"Has 5 keys\"] = jsonData.length === 5;",
+									"tests[\"Has 7 keys\"] = jsonData.length === 7;",
 									"tests[\"Has RECEIVED\"] = jsonData[0] === \"PENDING\";",
-									"tests[\"Has IN_PROGRESS\"] = jsonData[1] === \"ASSIGNED\";",
-									"tests[\"Has COMPLETED\"] = jsonData[2] === \"LOCALIZATION\";",
-									"tests[\"Has CANCELED\"] = jsonData[3] === \"LOCALIZED\";",
-									"tests[\"Has FAILED\"] = jsonData[4] === \"ABORTED\";"
+									"tests[\"Has DISCOVERY\"] = jsonData[1] === \"DISCOVERY\";",
+									"tests[\"Has AWAITING_SOURCES\"] = jsonData[2] === \"AWAITING_SOURCES\";",
+									"tests[\"Has READY_FOR_QC\"] = jsonData[3] === \"READY_FOR_QC\";",
+									"tests[\"Has QC_IN_PROGRESS\"] = jsonData[4] === \"QC_IN_PROGRESS\";",
+									"tests[\"Has QC_PASS\"] = jsonData[5] === \"QC_PASS\";",
+									"tests[\"Has QC_FAIL\"] = jsonData[6] === \"QC_FAIL\";"
 								],
 								"type": "text/javascript"
 							}
@@ -1612,6 +1614,80 @@
 							]
 						},
 						"description": "Returns orders with given external reference (PO Number)"
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/orders/$id/check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "275e7d8d-c0b3-4768-9cfd-f83a93bf9f48",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}/check",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"orders",
+								"{{NewOrderID}}",
+								"check"
+							]
+						},
+						"description": "Performs consitency check on order."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/orders/$id/updateAggregates",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "275e7d8d-c0b3-4768-9cfd-f83a93bf9f48",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}/updateAggregates",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"orders",
+								"{{NewOrderID}}",
+								"updateAggregates"
+							]
+						},
+						"description": "Updates aggregations for a single order."
 					},
 					"response": []
 				},
