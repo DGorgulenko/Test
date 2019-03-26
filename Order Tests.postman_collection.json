@@ -182,7 +182,7 @@
 					"response": []
 				},
 				{
-					"name": "Returns all possible statuses for deliverable.",
+					"name": "GET /v1/consts/deliverable/status",
 					"event": [
 						{
 							"listen": "test",
@@ -231,12 +231,13 @@
 								"deliverable",
 								"status"
 							]
-						}
+						},
+						"description": "Returns all possible statuses for deliverable."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible delivery types for delivery job.",
+					"name": "GET /v1/consts/deliveryjob/type",
 					"event": [
 						{
 							"listen": "test",
@@ -283,12 +284,13 @@
 								"deliveryjob",
 								"type"
 							]
-						}
+						},
+						"description": "Returns all possible delivery types for delivery job."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible stages for deliverable.",
+					"name": "GET /v1/consts/deliverable/stage",
 					"event": [
 						{
 							"listen": "test",
@@ -342,12 +344,13 @@
 								"deliverable",
 								"stage"
 							]
-						}
+						},
+						"description": "Returns all possible stages for deliverable."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible draft types.",
+					"name": "GET /v1/consts/draftorder/type",
 					"event": [
 						{
 							"listen": "test",
@@ -393,12 +396,13 @@
 								"draftorder",
 								"type"
 							]
-						}
+						},
+						"description": "Returns all possible draft types."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible cancellation reasons for delivery job.",
+					"name": "GET /v1/consts/deliveryjob/cancellationReason",
 					"event": [
 						{
 							"listen": "test",
@@ -446,12 +450,13 @@
 								"deliveryjob",
 								"cancellationReason"
 							]
-						}
+						},
+						"description": "Returns all possible cancellation reasons for delivery job."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all possible statuses for order.",
+					"name": "GET /v1/consts/order/status",
 					"event": [
 						{
 							"listen": "test",
@@ -502,12 +507,13 @@
 								"order",
 								"status"
 							]
-						}
+						},
+						"description": "Returns all possible statuses for order."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns all information regarding job types.",
+					"name": "GET /v1/consts/job/types",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -582,7 +588,8 @@
 								"job",
 								"types"
 							]
-						}
+						},
+						"description": "Returns all information regarding job types."
 					},
 					"response": []
 				}
@@ -614,7 +621,7 @@
 			"name": "Orders",
 			"item": [
 				{
-					"name": "Performs consitency check on all orders.",
+					"name": "GET /v1/orders/checkAll",
 					"event": [
 						{
 							"listen": "test",
@@ -644,12 +651,13 @@
 								"orders",
 								"checkAll"
 							]
-						}
+						},
+						"description": "Performs consitency check on all orders."
 					},
 					"response": []
 				},
 				{
-					"name": "Creates new order using provided data.",
+					"name": "POST /v1/orders",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -740,12 +748,13 @@
 								"v1",
 								"orders"
 							]
-						}
+						},
+						"description": "Creates new order using provided data."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns information about specified order.",
+					"name": "GET /v1/orders/$id",
 					"event": [
 						{
 							"listen": "test",
@@ -812,12 +821,13 @@
 								"orders",
 								"{{NewOrderID}}"
 							]
-						}
+						},
+						"description": "Returns information about specified order."
 					},
 					"response": []
 				},
 				{
-					"name": "Updates existing order with provided data.",
+					"name": "PUT /v1/orders",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -905,12 +915,13 @@
 								"v1",
 								"orders"
 							]
-						}
+						},
+						"description": "Updates existing order with provided data."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns full information about order. Includes all associated jobs.",
+					"name": "GET /v1/orders/$id/full",
 					"event": [
 						{
 							"listen": "test",
@@ -990,12 +1001,13 @@
 								"{{NewOrderID}}",
 								"full"
 							]
-						}
+						},
+						"description": "Returns full information about order. Includes all associated jobs."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns entity change for specified order and entity version.",
+					"name": "GET /v1/orders/$id/history/$OrderVersion",
 					"event": [
 						{
 							"listen": "test",
@@ -1043,12 +1055,13 @@
 								"history",
 								"{{OrderVersion}}"
 							]
-						}
+						},
+						"description": "Returns entity change for specified order and entity version."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns a range of changes applied to specified order.",
+					"name": "GET /v1/orders/$id/history?take=500",
 					"event": [
 						{
 							"listen": "test",
@@ -1110,12 +1123,13 @@
 									"value": "500"
 								}
 							]
-						}
+						},
+						"description": "Returns a range of changes applied to specified order."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns orders with given external reference (PO Number)",
+					"name": "GET /v1/orders/byexternalreference/$externalReference",
 					"event": [
 						{
 							"listen": "test",
@@ -1178,12 +1192,13 @@
 									"value": "{{ExternalReference}}"
 								}
 							]
-						}
+						},
+						"description": "Returns orders with given external reference (PO Number)"
 					},
 					"response": []
 				},
 				{
-					"name": "Clones target order and all asociated jobs.",
+					"name": "POST /v1/orders/clone",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1254,12 +1269,13 @@
 								"orders",
 								"clone"
 							]
-						}
+						},
+						"description": "Clones target order and all asociated jobs."
 					},
 					"response": []
 				},
 				{
-					"name": "Aborts specified order.",
+					"name": "DELETE /v1/orders/$id?cancellationReason=INVALID_ORDER_DATA",
 					"event": [
 						{
 							"listen": "test",
@@ -1302,7 +1318,8 @@
 									"disabled": true
 								}
 							]
-						}
+						},
+						"description": "Aborts specified order."
 					},
 					"response": []
 				}
@@ -1312,7 +1329,7 @@
 			"name": "DeliveryJobs",
 			"item": [
 				{
-					"name": "Returns all jobs currently blocked by do-not-deliver-before dates.",
+					"name": "GET /v1/deliveryjobs/blockedDndb",
 					"event": [
 						{
 							"listen": "test",
@@ -1347,12 +1364,13 @@
 								"deliveryjobs",
 								"blockedDndb"
 							]
-						}
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
 					},
 					"response": []
 				},
 				{
-					"name": "Performs consistency check on all delivery jobs.",
+					"name": "GET /v1/deliveryjobs/checkAll?fullScan=false",
 					"event": [
 						{
 							"listen": "test",
@@ -1388,7 +1406,8 @@
 									"value": "false"
 								}
 							]
-						}
+						},
+						"description": "Performs consistency check on all delivery jobs."
 					},
 					"response": []
 				}
@@ -1398,7 +1417,7 @@
 			"name": "LicensingJobs",
 			"item": [
 				{
-					"name": "Creates new licensing job using provided data. Skip no tests",
+					"name": "POST /v1/licensingjobs",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1436,12 +1455,13 @@
 								"v1",
 								"licensingjobs"
 							]
-						}
+						},
+						"description": "Creates new licensing job using provided data. Skip no tests"
 					},
 					"response": []
 				},
 				{
-					"name": "Performs search query for licensing jobs.",
+					"name": "POST /v1/licensingjobs/find",
 					"event": [
 						{
 							"listen": "test",
@@ -1504,12 +1524,13 @@
 								"licensingjobs",
 								"find"
 							]
-						}
+						},
+						"description": "Performs search query for licensing jobs."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns full information about specified licensing job.",
+					"name": "GET /v1/licensingjobs/$LicenseId",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1574,12 +1595,13 @@
 								"licensingjobs",
 								"{{LicenseId}}"
 							]
-						}
+						},
+						"description": "Returns full information about specified licensing job."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns entity change for specified licensing job and entity version.",
+					"name": "GET /v1/licensingjobs/$LicenseId/history/$LicenseVersion",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1639,12 +1661,13 @@
 								"history",
 								"{{LicenseVersion}}"
 							]
-						}
+						},
+						"description": "Returns entity change for specified licensing job and entity version."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns list of licensing jobs for order.",
+					"name": "GET /v1/licensingjobs/fororder/$LicenseOrderId",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1690,12 +1713,13 @@
 								"fororder",
 								"{{LicenseOrderId}}"
 							]
-						}
+						},
+						"description": "Returns list of licensing jobs for order."
 					},
 					"response": []
 				},
 				{
-					"name": "Returns a range of changes applied to specified licensing job.",
+					"name": "GET /v1/licensingjobs/$LicenseId/history?take=500",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1771,7 +1795,8 @@
 									"value": "500"
 								}
 							]
-						}
+						},
+						"description": "Returns a range of changes applied to specified licensing job."
 					},
 					"response": []
 				}
