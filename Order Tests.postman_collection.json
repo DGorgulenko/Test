@@ -9,6 +9,115 @@
 			"name": "Const",
 			"item": [
 				{
+					"name": "GET /v1/consts/order/status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches RECEIVED\"] = responseBody.has(\"RECEIVED\");",
+									"tests[\"Body matches IN_PROGRESS\"] = responseBody.has(\"IN_PROGRESS\");",
+									"tests[\"Body matches COMPLETED\"] = responseBody.has(\"COMPLETED\");",
+									"tests[\"Body matches REJECTED\"] = responseBody.has(\"REJECTED\");",
+									"tests[\"Body matches FAILED\"] = responseBody.has(\"FAILED\");",
+									"tests[\"Body matches CANCELED\"] = responseBody.has(\"CANCELED\");",
+									"tests[\"Body matches AWAITING_SOURCES\"] = responseBody.has(\"AWAITING_SOURCES\");",
+									"tests[\"Body matches AWAITING_INPUT\"] = responseBody.has(\"AWAITING_INPUT\");",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 8 statuses\"] = jsonData.length === 8;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/order/status",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"order",
+								"status"
+							]
+						},
+						"description": "Returns all possible statuses for order."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/order/category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"var keys = Object.keys( jsonData );",
+									"tests[\"Has 5 keys\"] = keys.length === 5;",
+									"tests[\"20: Inter-company Task\"] = jsonData[keys[0]] === \"Inter-company Task\";",
+									"tests[\"30: Internal QC\"] = jsonData[keys[1]] === \"Internal QC\";",
+									"tests[\"40: Internal Test\"] = jsonData[keys[2]] === \"Internal Test\";",
+									"tests[\"50: Onboarding Test\"] = jsonData[keys[3]] === \"Onboarding Test\";",
+									"tests[\"100: Regular Order\"] = jsonData[keys[4]] === \"Regular Order\";",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/order/category",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"order",
+								"category"
+							]
+						},
+						"description": "Returns all known order categories."
+					},
+					"response": []
+				},
+				{
 					"name": "GET /v1/consts/deliveryjob/status",
 					"event": [
 						{
@@ -456,63 +565,6 @@
 					"response": []
 				},
 				{
-					"name": "GET /v1/consts/order/status",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
-								"exec": [
-									"//Check Status Code",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"",
-									"//Check that all required statuses are present",
-									"tests[\"Body matches RECEIVED\"] = responseBody.has(\"RECEIVED\");",
-									"tests[\"Body matches IN_PROGRESS\"] = responseBody.has(\"IN_PROGRESS\");",
-									"tests[\"Body matches COMPLETED\"] = responseBody.has(\"COMPLETED\");",
-									"tests[\"Body matches REJECTED\"] = responseBody.has(\"REJECTED\");",
-									"tests[\"Body matches FAILED\"] = responseBody.has(\"FAILED\");",
-									"tests[\"Body matches CANCELED\"] = responseBody.has(\"CANCELED\");",
-									"tests[\"Body matches AWAITING_SOURCES\"] = responseBody.has(\"AWAITING_SOURCES\");",
-									"tests[\"Body matches AWAITING_INPUT\"] = responseBody.has(\"AWAITING_INPUT\");",
-									"console.log(\"Response: \"+responseBody);",
-									"//check Json Parse",
-									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 8 statuses\"] = jsonData.length === 8;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/order/status",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"consts",
-								"order",
-								"status"
-							]
-						},
-						"description": "Returns all possible statuses for order."
-					},
-					"response": []
-				},
-				{
 					"name": "GET /v1/consts/job/types",
 					"event": [
 						{
@@ -590,6 +642,63 @@
 							]
 						},
 						"description": "Returns all information regarding job types."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/order/status Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches RECEIVED\"] = responseBody.has(\"RECEIVED\");",
+									"tests[\"Body matches IN_PROGRESS\"] = responseBody.has(\"IN_PROGRESS\");",
+									"tests[\"Body matches COMPLETED\"] = responseBody.has(\"COMPLETED\");",
+									"tests[\"Body matches REJECTED\"] = responseBody.has(\"REJECTED\");",
+									"tests[\"Body matches FAILED\"] = responseBody.has(\"FAILED\");",
+									"tests[\"Body matches CANCELED\"] = responseBody.has(\"CANCELED\");",
+									"tests[\"Body matches AWAITING_SOURCES\"] = responseBody.has(\"AWAITING_SOURCES\");",
+									"tests[\"Body matches AWAITING_INPUT\"] = responseBody.has(\"AWAITING_INPUT\");",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 8 statuses\"] = jsonData.length === 8;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/order/status",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"order",
+								"status"
+							]
+						},
+						"description": "Returns all possible statuses for order."
 					},
 					"response": []
 				}
