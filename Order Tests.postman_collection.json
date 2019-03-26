@@ -118,6 +118,460 @@
 					"response": []
 				},
 				{
+					"name": "GET /v1/consts/job/types",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "77b3da42-5881-4599-986d-4116d9decc8d",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2cb4364a-176d-4d86-b2e9-ee630e7f504f",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"//Check that all required statuses are present",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//check Localization",
+									"var Localization = jsonData.Localization;",
+									"tests[\"Localization has correct jobKey\"] = Localization.jobKey === \"localizationjobs\";",
+									"//check Licensing",
+									"var Licensing = jsonData.Licensing;",
+									"tests[\"Licensing has correct jobKey\"] = Licensing.jobKey === \"licensingjobs\";",
+									"//check Delivery ",
+									"var Delivery = jsonData.Delivery;",
+									"tests[\"Delivery has correct subTypeField\"] = Delivery.subTypeField === \"DeliveryJobType\";",
+									"tests[\"Delivery has correct jobKey\"] = Delivery.jobKey === \"deliveryjobs\";",
+									"var subTypes = Delivery.subTypes;",
+									"//check Subtypes count",
+									"tests[\"subTypes has 3 objects\"] = subTypes.length === 3;",
+									"//check Subtypes AUTOMATIC",
+									"tests[\"First subTypes is AUTOMATIC\"] = subTypes[0].value === \"AUTOMATIC\";",
+									"tests[\"First subTypes has label 'Automated'\"] = subTypes[0].label === \"Automated\";",
+									"//check Subtypes MANUAL_PASS_THROUGH",
+									"tests[\"Second subTypes is MANUAL_PASS_THROUGH\"] = subTypes[1].value === \"MANUAL_PASS_THROUGH\";",
+									"tests[\"Second subTypes has label 'Pass Through'\"] = subTypes[1].label === \"Pass Through\";",
+									"//check Subtypes TRANSCODE_PASS_THROUGH",
+									"tests[\"Third subTypes is TRANSCODE_PASS_THROUGH\"] = subTypes[2].value === \"TRANSCODE_PASS_THROUGH\";",
+									"tests[\"Third subTypes has label 'Transcode Pass Through'\"] = subTypes[2].label === \"Transcode Pass Through\";",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/job/types",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"job",
+								"types"
+							]
+						},
+						"description": "Returns all information regarding job types."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/job/slas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"var keys = Object.keys( jsonData );",
+									"tests[\"Has 5 keys\"] = jsonData.length === 3;",
+									"tests[\"Has P12\"] = jsonData[0] === \"P12\";",
+									"tests[\"Has P24\"] = jsonData[1] === \"P24\";",
+									"tests[\"Has STD\"] = jsonData[2] === \"STD\";",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/job/slas",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"job",
+								"slas"
+							]
+						},
+						"description": "Returns all possible SLAs for job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/order/cancellationReason",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "76b6fc1a-65b2-4f79-baba-e17951e2ebae",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches LICENSING_ISSUE\"] = responseBody.has(\"LICENSING_ISSUE\");",
+									"tests[\"Body matches ALTERNATE_DELIVERY\"] = responseBody.has(\"ALTERNATE_DELIVERY\");",
+									"tests[\"Body matches INCORRECT_TITLE\"] = responseBody.has(\"INCORRECT_TITLE\");",
+									"tests[\"Body matches INVALID_ORDER_DATA\"] = responseBody.has(\"INVALID_ORDER_DATA\");",
+									"",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 7 statuses\"] = jsonData.length === 4;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/order/cancellationReason",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"order",
+								"cancellationReason"
+							]
+						},
+						"description": "Returns all possible cancellation reasons for order."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/deliveryjob/cancellationReason",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e3a015a0-0c1c-404c-9615-269a4bd234cd",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches LICENSING_ISSUE\"] = responseBody.has(\"LICENSING_ISSUE\");",
+									"tests[\"Body matches ALTERNATE_DELIVERY\"] = responseBody.has(\"ALTERNATE_DELIVERY\");",
+									"tests[\"Body matches INCORRECT_TITLE\"] = responseBody.has(\"INCORRECT_TITLE\");",
+									"tests[\"Body matches INVALID_ORDER_DATA\"] = responseBody.has(\"INVALID_ORDER_DATA\");",
+									"",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 7 statuses\"] = jsonData.length === 4;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/deliveryjob/cancellationReason",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"deliveryjob",
+								"cancellationReason"
+							]
+						},
+						"description": "Returns all possible cancellation reasons for delivery job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/deliveryjob/type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "323c317b-48cb-4182-9d30-bf5815e0e075",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches AUTOMATIC\"] = responseBody.has(\"AUTOMATIC\");",
+									"tests[\"Body matches MANUAL_PASS_THROUGH\"] = responseBody.has(\"MANUAL_PASS_THROUGH\");",
+									"tests[\"Body matches TRANSCODE_PASS_THROUGH\"] = responseBody.has(\"TRANSCODE_PASS_THROUGH\");",
+									"",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 7 statuses\"] = jsonData.length === 3;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/deliveryjob/type",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"deliveryjob",
+								"type"
+							]
+						},
+						"description": "Returns all possible delivery types for delivery job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/draftorder/type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "37177528-3da7-4f92-a437-80e79c7be3a4",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches USER\"] = responseBody.has(\"USER\");",
+									"tests[\"Body matches SYSTEM\"] = responseBody.has(\"SYSTEM\");",
+									"",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 7 statuses\"] = jsonData.length === 2;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/draftorder/type",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"draftorder",
+								"type"
+							]
+						},
+						"description": "Returns all possible draft types."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/compliancejob/status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"var keys = Object.keys( jsonData );",
+									"tests[\"Has 5 keys\"] = jsonData.length === 5;",
+									"tests[\"Has RECEIVED\"] = jsonData[0] === \"RECEIVED\";",
+									"tests[\"Has IN_PROGRESS\"] = jsonData[1] === \"IN_PROGRESS\";",
+									"tests[\"Has COMPLETED\"] = jsonData[2] === \"COMPLETED\";",
+									"tests[\"Has CANCELED\"] = jsonData[3] === \"CANCELED\";",
+									"tests[\"Has FAILED\"] = jsonData[4] === \"FAILED\";",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/compliancejob/status",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"compliancejob",
+								"status"
+							]
+						},
+						"description": "Returns all possible statuses for delivery job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/compliancejob/stage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"var keys = Object.keys( jsonData );",
+									"tests[\"Has 10 keys\"] = jsonData.length === 10;",
+									"tests[\"Has PENDING\"] = jsonData[0] === \"PENDING\";",
+									"tests[\"Has DISCOVERY\"] = jsonData[1] === \"DISCOVERY\";",
+									"tests[\"Has AWAITING_SOURCES\"] = jsonData[2] === \"AWAITING_SOURCES\";",
+									"tests[\"Has RESOLVING_MATERIALS\"] = jsonData[3] === \"RESOLVING_MATERIALS\";",
+									"tests[\"Has CREATING_PROXY\"] = jsonData[4] === \"CREATING_PROXY\";",
+									"tests[\"Has READY_FOR_COMPLIANCE_MARKING\"] = jsonData[5] === \"READY_FOR_COMPLIANCE_MARKING\";",
+									"tests[\"Has COMPLIANCE_MARKING\"] = jsonData[6] === \"COMPLIANCE_MARKING\";",
+									"tests[\"Has READY_FOR_EDIT\"] = jsonData[7] === \"READY_FOR_EDIT\";",
+									"tests[\"Has EDIT\"] = jsonData[8] === \"EDIT\";",
+									"tests[\"Has DELIVERED\"] = jsonData[9] === \"DELIVERED\";",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/compliancejob/stage",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"compliancejob",
+								"stage"
+							]
+						},
+						"description": "Returns all possible stages for delivery job."
+					},
+					"response": []
+				},
+				{
 					"name": "GET /v1/consts/deliveryjob/status",
 					"event": [
 						{
@@ -238,25 +692,23 @@
 					"response": []
 				},
 				{
-					"name": "GET /v1/consts/order/cancellationReason",
+					"name": "GET /v1/consts/localizationjob/status",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "76b6fc1a-65b2-4f79-baba-e17951e2ebae",
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
 								"exec": [
 									"//Check Status Code",
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"console.log(\"Response: \"+responseBody);",
-									"//Check that all required statuses are present",
-									"tests[\"Body matches LICENSING_ISSUE\"] = responseBody.has(\"LICENSING_ISSUE\");",
-									"tests[\"Body matches ALTERNATE_DELIVERY\"] = responseBody.has(\"ALTERNATE_DELIVERY\");",
-									"tests[\"Body matches INCORRECT_TITLE\"] = responseBody.has(\"INCORRECT_TITLE\");",
-									"tests[\"Body matches INVALID_ORDER_DATA\"] = responseBody.has(\"INVALID_ORDER_DATA\");",
-									"",
-									"//check Json Parse",
 									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 7 statuses\"] = jsonData.length === 4;"
+									"//Check that all required statuses are present",
+									"tests[\"Has 5 keys\"] = jsonData.length === 5;",
+									"tests[\"Has RECEIVED\"] = jsonData[0] === \"RECEIVED\";",
+									"tests[\"Has IN_PROGRESS\"] = jsonData[1] === \"IN_PROGRESS\";",
+									"tests[\"Has COMPLETED\"] = jsonData[2] === \"COMPLETED\";",
+									"tests[\"Has CANCELED\"] = jsonData[3] === \"CANCELED\";",
+									"tests[\"Has FAILED\"] = jsonData[4] === \"FAILED\";"
 								],
 								"type": "text/javascript"
 							}
@@ -275,18 +727,172 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/order/cancellationReason",
+							"raw": "{{OrderAPIHost}}/v1/consts/localizationjob/status",
 							"host": [
 								"{{OrderAPIHost}}"
 							],
 							"path": [
 								"v1",
 								"consts",
-								"order",
-								"cancellationReason"
+								"localizationjob",
+								"status"
 							]
 						},
-						"description": "Returns all possible cancellation reasons for order."
+						"description": "Returns all possible statuses for localization job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/localizationjob/stage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"//Check that all required statuses are present",
+									"tests[\"Has 5 keys\"] = jsonData.length === 5;",
+									"tests[\"Has RECEIVED\"] = jsonData[0] === \"PENDING\";",
+									"tests[\"Has IN_PROGRESS\"] = jsonData[1] === \"ASSIGNED\";",
+									"tests[\"Has COMPLETED\"] = jsonData[2] === \"LOCALIZATION\";",
+									"tests[\"Has CANCELED\"] = jsonData[3] === \"LOCALIZED\";",
+									"tests[\"Has FAILED\"] = jsonData[4] === \"ABORTED\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/localizationjob/stage",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"localizationjob",
+								"stage"
+							]
+						},
+						"description": "Returns all possible stages for delivery job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET  /v1/consts/qcjob/status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"//Check that all required statuses are present",
+									"tests[\"Has 6 keys\"] = jsonData.length === 6;",
+									"tests[\"Has RECEIVED\"] = jsonData[0] === \"RECEIVED\";",
+									"tests[\"Has AWAITING_SOURCES\"] = jsonData[1] === \"AWAITING_SOURCES\";",
+									"tests[\"Has IN_PROGRESS\"] = jsonData[2] === \"IN_PROGRESS\";",
+									"tests[\"Has COMPLETED\"] = jsonData[3] === \"COMPLETED\";",
+									"tests[\"Has CANCELED\"] = jsonData[4] === \"CANCELED\";",
+									"tests[\"Has FAILED\"] = jsonData[5] === \"FAILED\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/qcjob/status",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"qcjob",
+								"status"
+							]
+						},
+						"description": "Returns all possible statuses for localization job."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/consts/qcjob/stage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"//Check that all required statuses are present",
+									"tests[\"Has 5 keys\"] = jsonData.length === 5;",
+									"tests[\"Has RECEIVED\"] = jsonData[0] === \"PENDING\";",
+									"tests[\"Has IN_PROGRESS\"] = jsonData[1] === \"ASSIGNED\";",
+									"tests[\"Has COMPLETED\"] = jsonData[2] === \"LOCALIZATION\";",
+									"tests[\"Has CANCELED\"] = jsonData[3] === \"LOCALIZED\";",
+									"tests[\"Has FAILED\"] = jsonData[4] === \"ABORTED\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/consts/qcjob/stage",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"qcjob",
+								"stage"
+							]
+						},
+						"description": "Returns all possible stages for delivery job."
 					},
 					"response": []
 				},
@@ -342,59 +948,6 @@
 							]
 						},
 						"description": "Returns all possible statuses for deliverable."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /v1/consts/deliveryjob/type",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "323c317b-48cb-4182-9d30-bf5815e0e075",
-								"exec": [
-									"//Check Status Code",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"console.log(\"Response: \"+responseBody);",
-									"",
-									"//Check that all required statuses are present",
-									"tests[\"Body matches AUTOMATIC\"] = responseBody.has(\"AUTOMATIC\");",
-									"tests[\"Body matches MANUAL_PASS_THROUGH\"] = responseBody.has(\"MANUAL_PASS_THROUGH\");",
-									"tests[\"Body matches TRANSCODE_PASS_THROUGH\"] = responseBody.has(\"TRANSCODE_PASS_THROUGH\");",
-									"",
-									"//check Json Parse",
-									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 7 statuses\"] = jsonData.length === 3;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/deliveryjob/type",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"consts",
-								"deliveryjob",
-								"type"
-							]
-						},
-						"description": "Returns all possible delivery types for delivery job."
 					},
 					"response": []
 				},
@@ -455,250 +1008,6 @@
 							]
 						},
 						"description": "Returns all possible stages for deliverable."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /v1/consts/draftorder/type",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "37177528-3da7-4f92-a437-80e79c7be3a4",
-								"exec": [
-									"//Check Status Code",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"console.log(\"Response: \"+responseBody);",
-									"",
-									"//Check that all required statuses are present",
-									"tests[\"Body matches USER\"] = responseBody.has(\"USER\");",
-									"tests[\"Body matches SYSTEM\"] = responseBody.has(\"SYSTEM\");",
-									"",
-									"//check Json Parse",
-									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 7 statuses\"] = jsonData.length === 2;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/draftorder/type",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"consts",
-								"draftorder",
-								"type"
-							]
-						},
-						"description": "Returns all possible draft types."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /v1/consts/deliveryjob/cancellationReason",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "e3a015a0-0c1c-404c-9615-269a4bd234cd",
-								"exec": [
-									"//Check Status Code",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"console.log(\"Response: \"+responseBody);",
-									"",
-									"//Check that all required statuses are present",
-									"tests[\"Body matches LICENSING_ISSUE\"] = responseBody.has(\"LICENSING_ISSUE\");",
-									"tests[\"Body matches ALTERNATE_DELIVERY\"] = responseBody.has(\"ALTERNATE_DELIVERY\");",
-									"tests[\"Body matches INCORRECT_TITLE\"] = responseBody.has(\"INCORRECT_TITLE\");",
-									"tests[\"Body matches INVALID_ORDER_DATA\"] = responseBody.has(\"INVALID_ORDER_DATA\");",
-									"",
-									"//check Json Parse",
-									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 7 statuses\"] = jsonData.length === 4;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/deliveryjob/cancellationReason",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"consts",
-								"deliveryjob",
-								"cancellationReason"
-							]
-						},
-						"description": "Returns all possible cancellation reasons for delivery job."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /v1/consts/job/types",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "77b3da42-5881-4599-986d-4116d9decc8d",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "2cb4364a-176d-4d86-b2e9-ee630e7f504f",
-								"exec": [
-									"//Check Status Code",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"console.log(\"Response: \"+responseBody);",
-									"//Check that all required statuses are present",
-									"var jsonData = JSON.parse(responseBody);",
-									"",
-									"//check Localization",
-									"var Localization = jsonData.Localization;",
-									"tests[\"Localization has correct jobKey\"] = Localization.jobKey === \"localizationjobs\";",
-									"//check Licensing",
-									"var Licensing = jsonData.Licensing;",
-									"tests[\"Licensing has correct jobKey\"] = Licensing.jobKey === \"licensingjobs\";",
-									"//check Delivery ",
-									"var Delivery = jsonData.Delivery;",
-									"tests[\"Delivery has correct subTypeField\"] = Delivery.subTypeField === \"DeliveryJobType\";",
-									"tests[\"Delivery has correct jobKey\"] = Delivery.jobKey === \"deliveryjobs\";",
-									"var subTypes = Delivery.subTypes;",
-									"//check Subtypes count",
-									"tests[\"subTypes has 3 objects\"] = subTypes.length === 3;",
-									"//check Subtypes AUTOMATIC",
-									"tests[\"First subTypes is AUTOMATIC\"] = subTypes[0].value === \"AUTOMATIC\";",
-									"tests[\"First subTypes has label 'Automated'\"] = subTypes[0].label === \"Automated\";",
-									"//check Subtypes MANUAL_PASS_THROUGH",
-									"tests[\"Second subTypes is MANUAL_PASS_THROUGH\"] = subTypes[1].value === \"MANUAL_PASS_THROUGH\";",
-									"tests[\"Second subTypes has label 'Pass Through'\"] = subTypes[1].label === \"Pass Through\";",
-									"//check Subtypes TRANSCODE_PASS_THROUGH",
-									"tests[\"Third subTypes is TRANSCODE_PASS_THROUGH\"] = subTypes[2].value === \"TRANSCODE_PASS_THROUGH\";",
-									"tests[\"Third subTypes has label 'Transcode Pass Through'\"] = subTypes[2].label === \"Transcode Pass Through\";",
-									"",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/job/types",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"consts",
-								"job",
-								"types"
-							]
-						},
-						"description": "Returns all information regarding job types."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /v1/consts/order/status Copy",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "f2d23089-ce90-4ea1-a9aa-4ac7fec098e0",
-								"exec": [
-									"//Check Status Code",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"",
-									"//Check that all required statuses are present",
-									"tests[\"Body matches RECEIVED\"] = responseBody.has(\"RECEIVED\");",
-									"tests[\"Body matches IN_PROGRESS\"] = responseBody.has(\"IN_PROGRESS\");",
-									"tests[\"Body matches COMPLETED\"] = responseBody.has(\"COMPLETED\");",
-									"tests[\"Body matches REJECTED\"] = responseBody.has(\"REJECTED\");",
-									"tests[\"Body matches FAILED\"] = responseBody.has(\"FAILED\");",
-									"tests[\"Body matches CANCELED\"] = responseBody.has(\"CANCELED\");",
-									"tests[\"Body matches AWAITING_SOURCES\"] = responseBody.has(\"AWAITING_SOURCES\");",
-									"tests[\"Body matches AWAITING_INPUT\"] = responseBody.has(\"AWAITING_INPUT\");",
-									"console.log(\"Response: \"+responseBody);",
-									"//check Json Parse",
-									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 8 statuses\"] = jsonData.length === 8;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "text/plain, application/json, text/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{OrderAPIHost}}/v1/consts/order/status",
-							"host": [
-								"{{OrderAPIHost}}"
-							],
-							"path": [
-								"v1",
-								"consts",
-								"order",
-								"status"
-							]
-						},
-						"description": "Returns all possible statuses for order."
 					},
 					"response": []
 				}
