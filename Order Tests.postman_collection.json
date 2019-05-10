@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8c1fd61a-d8d9-48cf-aa70-073ff5607c13",
+		"_postman_id": "b31697e9-b667-4e93-8734-fbbc14073215",
 		"name": "Order Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -919,7 +919,7 @@
 									"",
 									"//check Json Parse",
 									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 7 statuses\"] = jsonData.length === 5;"
+									"tests[\"Has 5 statuses\"] = jsonData.length === 5;"
 								],
 								"type": "text/javascript"
 							}
@@ -979,7 +979,7 @@
 									"",
 									"//check Json Parse",
 									"var jsonData = JSON.parse(responseBody);",
-									"tests[\"Has 7 statuses\"] = jsonData.length === 10;"
+									"tests[\"Has 10 statuses\"] = jsonData.length === 10;"
 								],
 								"type": "text/javascript"
 							}
@@ -1038,6 +1038,675 @@
 			]
 		},
 		{
+			"name": "Statistic",
+			"item": [
+				{
+					"name": "GET /v1/stats/orders/total",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(typeof(responseBody));",
+									"tests[\"Response is not a null\"] = responseBody.length > 0;",
+									"//Check that all required statuses are present",
+									"pm.environment.set(\"Statistic_TotalJobs\", responseBody);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f983a06c-64b1-45cb-bd32-de3cfa0de8bf",
+								"exec": [
+									"pm.environment.set(\"Statistic_FromDate\", \"2019-03-22T16:15:11.8577542Z\");",
+									"pm.environment.set(\"Statistic_ToDate\", \"2019-03-28T16:15:11.8577542Z\");",
+									"pm.environment.set(\"Statistic_Customer\", \"44d741fd\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/total?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"total"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/byStatus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body matches CANCELED\"] = responseBody.has(\"CANCELED\");",
+									"tests[\"Body matches FAILED\"] = responseBody.has(\"FAILED\");",
+									"tests[\"Body matches AWAITING_SOURCES\"] = responseBody.has(\"AWAITING_SOURCES\");",
+									"tests[\"Body matches IN_PROGRESS\"] = responseBody.has(\"IN_PROGRESS\");",
+									"tests[\"Body matches AWAITING_INPUT\"] = responseBody.has(\"AWAITING_INPUT\");",
+									"tests[\"Body matches COMPLETED\"] = responseBody.has(\"COMPLETED\");",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 6 statuses\"] = Object.keys(jsonData).length === 6;",
+									"var sum = 0;",
+									"sum += jsonData.CANCELED;",
+									"sum += jsonData.FAILED;",
+									"sum += jsonData.AWAITING_INPUT;",
+									"sum += jsonData.AWAITING_SOURCES;",
+									"sum += jsonData.COMPLETED;",
+									"sum += jsonData.IN_PROGRESS;",
+									"var checksum = pm.environment.get(\"Statistic_TotalJobs\");",
+									"pm.environment.set(\"Statistic_Statuses\", jsonData);",
+									"tests[\"Checksum test\"] = sum == checksum;",
+									"console.log(\"Response: \"+checksum+\" || \"+ sum);",
+									"//Check that all required statuses are present",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/byStatus?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"byStatus"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/daily",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 7 statuses\"] = Object.keys(jsonData).length === 7;",
+									"//Check that all required statuses are present",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/daily?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/averagedays/createdToWorkable",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Response is not a null\"] = responseBody.length > 0;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/averagedays/createdToWorkable?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"averagedays",
+								"createdToWorkable"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/averagedays/createdToDue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Response is not a null\"] = responseBody.length > 0;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/averagedays/createdToDue?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"averagedays",
+								"createdToDue"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/averagedays/workableToShipped",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Response is not a null\"] = responseBody.length > 0;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/averagedays/workableToShipped?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"averagedays",
+								"workableToShipped"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/percentage/onTime",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Response is not a null\"] = responseBody.length > 0;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/percentage/onTime?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"percentage",
+								"onTime"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/orders/percentage/completed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"pm.environment.set(\"Statistic_PercentCompleted\", responseBody);",
+									"//Check that all required statuses are present",
+									"tests[\"Response is not a null\"] = responseBody.length > 0;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/orders/percentage/completed?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"orders",
+								"percentage",
+								"completed"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/jobs/topDistributors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"",
+									"tests[\"Has 3 statuses\"] = Object.keys(jsonData).length === 3;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/jobs/topDistributors?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}&topCount=3",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"jobs",
+								"topDistributors"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								},
+								{
+									"key": "topCount",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/stats/jobs/statistics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa0be8f2-251f-4bbd-9857-f457e74a2ccc",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"if (responseCode.code === 200)",
+									"{",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 12 statuses\"] = Object.keys(jsonData).length === 12;",
+									"var checksum = pm.environment.get(\"Statistic_TotalJobs\");",
+									"tests[\"Checksum test\"] = jsonData.createdJobsCount == checksum;",
+									"var ByStatuses = pm.environment.get(\"Statistic_Statuses\");",
+									"var PercentCompleted = pm.environment.get(\"Statistic_PercentCompleted\");",
+									"tests[\"completedJobsCount test\"] =  jsonData.completedJobsCount == ByStatuses.COMPLETED;",
+									"tests[\"inProgressJobsCount test\"] =  jsonData.inProgressJobsCount == ByStatuses.IN_PROGRESS;",
+									"tests[\"awaitingSourcesJobsCount test\"] =  jsonData.awaitingSourcesJobsCount == ByStatuses.AWAITING_SOURCES;",
+									"tests[\"awaitingInputJobsCount test\"]  = jsonData.awaitingInputJobsCount == ByStatuses.AWAITING_INPUT;",
+									"tests[\"canceledJobsCount test\"] =  jsonData.canceledJobsCount == ByStatuses.CANCELED;",
+									"tests[\"failedJobsCount test\"]  = jsonData.failedJobsCount == ByStatuses.FAILED;",
+									"tests[\"completedJobsPercentage test\"]  = jsonData.completedJobsPercentage == PercentCompleted;",
+									"",
+									"    ",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/stats/jobs/statistics?from={{Statistic_FromDate}}&to={{Statistic_ToDate}}&customerid={{Statistic_Customer}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stats",
+								"jobs",
+								"statistics"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{Statistic_FromDate}}"
+								},
+								{
+									"key": "to",
+									"value": "{{Statistic_ToDate}}"
+								},
+								{
+									"key": "customerid",
+									"value": "{{Statistic_Customer}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Orders",
 			"item": [
 				{
@@ -1080,9 +1749,28 @@
 					"name": "POST /v1/orders",
 					"event": [
 						{
+							"listen": "test",
+							"script": {
+								"id": "62a2b4e2-d3c5-4e8b-810d-521042430225",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code === 201;",
+									"//Check each property",
+									"if (responseCode.code === 201)",
+									"{",
+									" console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"NewOrderID\", jsonData.value);",
+									" tests[\"Has error check\"] = jsonData.hasErrors === false;",
+									" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0;   ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8b116a59-b5fc-4cb4-9e81-cd4ff9722e64",
+								"id": "d64e7b46-b8f2-428c-9a76-bfd11fbf29c1",
 								"exec": [
 									"function makeid() {\r",
 									"  var text = \"\";\r",
@@ -1117,25 +1805,6 @@
 									"var json ='{   \"description\": \"Jumanji QA\",   \"customer\": \"44d741fd\",   \"originalDue\": \"'+DueDate.toISOString()+'\",   \"originalDoNotDeliverBefore\": \"'+DNDBDate.toISOString()+'\",   \"externalReference\": \"'+ExternalReference+'\",   \"deliveryJobs\": [     {       \"customerPackageProfile\": \"ssa-nl168\",       \"customerWorkflow\": \"FirstTimePublish\",       \"targetCustomer\": \"44d741fd\",       \"targetCustomerId\": null,       \"targetTerritory\": \"IRL\",       \"targetLanguage\": \"eng\",       \"contentOwnerId\": \"e3b59a42\",       \"doNotDeliverBefore\": \"'+DNDBDate.toISOString()+'\",       \"availabilityStart\": \"'+AvaliabilityStart.toISOString()+'\",       \"availabilityEnd\": \"'+AvaliabilityEnd.toISOString()+'\",       \"allowProcessing\": true,       \"allowPackaging\": true,       \"allowDelivery\": true,       \"deliveryJobType\": \"AUTOMATIC\",       \"customer\": \"44d741fd\",       \"description\": \"123test\",       \"titleId\": \"AWUxwBLXF_AfgjR72RFb\",       \"titleVersion\": \"AWUzlEms6FbSZ_x5fb9A\",       \"due\": \"'+DueDate.toISOString()+'\",       \"details\": {         \"LGI_OrderOrigin\": \"Picklist\",         \"LicenseID\": \"11\",         \"Operator\": \"IE_Virgin\",         \"Contract\": \"Sony TVoD - UPC IE (2015-18)\",         \"OrderingResolutionRight\": \"HD\",         \"DeliveryResolution\": \"HD\",         \"YearOfProduction\": \"2017\",         \"CountriesOfProduction\": \"USA\",         \"ExternalLicenseID\": \"11\",         \"Studio\": \"Sony\",         \"SubtitleLanguage\": \"eng\",         \"AudioLanguage\": \"eng\",         \"UniqueProgramID\": \"52369_IRELAND_eng\",         \"AudioFormat\": \"OV with subtitles,HOH subtitles\",         \"ProducedLanguage\": \"eng\",         \"SimsTitleID\": \"\",         \"SimsClearanceID\": \"\",         \"SubScriptionType\": \"TVOD\",         \"ViewingPeriod\": \"48\",         \"AlternativeName\": \"\",         \"Genre\": \"movie/family\",         \"Relicense\": \"No\",         \"OrionFlag\": \"STB\",         \"RunTime\": \"02:00:00\",         \"ContractTitleCategory\": \"D&D\",         \"DownloadToGoDuration\": \"\",         \"ExpiryAfterPlayDuration\": \"\",         \"MaxActiveDownloads\": \"\",         \"StudioLicenseID\": \"BW78561289\",         \"EPGCategories\": \"IRELAND/DATA/TVOD/MOVIES\"       }     }   ] }';\r",
 									"\r",
 									"pm.environment.set(\"OrderCreaterequest\", json);"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "7a967332-c1c5-4f39-891a-fce6a0efa9c6",
-								"exec": [
-									"tests[\"Status code is 201\"] = responseCode.code === 201;",
-									"//Check each property",
-									"if (responseCode.code === 201)",
-									"{",
-									" console.log(\"Response: \"+responseBody);   ",
-									" var jsonData = JSON.parse(responseBody);",
-									" pm.environment.set(\"NewOrderID\", jsonData.value);",
-									" tests[\"Has error check\"] = jsonData.hasErrors === false;",
-									" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0;   ",
-									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -1271,7 +1940,7 @@
 									"var temp = pm.environment.get(\"OrderCreaterequest\");",
 									"var version = pm.environment.get(\"OrderVersion\");",
 									"var CreationRequest = JSON.parse(temp);",
-									"var OrderUpdateBody = '{   \"id\": \"'+orderId+'\",   \"version\": \"'+version+'\",   \"description\": \"'+CreationRequest.description+' Updated\",   \"billableCustomerId\": null,   \"externalReference\": \"'+NewExternalReference+'\" }';",
+									"var OrderUpdateBody = '{   \"id\": \"'+orderId+'\",   \"version\": 4,   \"description\": \"'+CreationRequest.description+' Updated\",   \"billableCustomerId\": null,   \"externalReference\": \"'+NewExternalReference+'\" }';",
 									"pm.environment.set(\"OrderUpdateBody\", OrderUpdateBody);",
 									"",
 									"console.log(\"Waiting Started\");",
@@ -1360,7 +2029,7 @@
 									"var orderId = pm.environment.get(\"NewOrderID\");",
 									"var temp = pm.environment.get(\"OrderCreaterequest\");",
 									"var CreationRequest = JSON.parse(temp);",
-									"",
+									"pm.environment.set(\"DeliveryJobID\", DeliveryJob.id);",
 									"tests[\"Order Id check\"] = Order.id === orderId;",
 									"tests[\"Order description check\"] = Order.description === (CreationRequest.description+\" Updated\");",
 									"tests[\"Order customer check\"] = Order.customer === CreationRequest.customer;",
@@ -1563,18 +2232,26 @@
 									"if (responseCode.code === 200)",
 									"{",
 									"var json = JSON.parse(responseBody);",
-									"var Order = json[0];",
-									"var orderId = pm.environment.get(\"NewOrderID\");",
-									"var temp = pm.environment.get(\"OrderCreaterequest\");",
-									"var CreationRequest = JSON.parse(temp);",
-									"",
-									"tests[\"Order Id check\"] = Order.id === orderId;",
-									"tests[\"Order description check\"] = Order.description === (CreationRequest.description+\" Updated\");",
-									"tests[\"Order customer check\"] = Order.customer === CreationRequest.customer;",
-									"tests[\"Order billable customer check\"] = Order.billableCustomerId === CreationRequest.customer;",
-									"tests[\"Order originalDue check\"] = Date(Order.originalDue) ==   Date(CreationRequest.originalDue);",
-									"tests[\"Order originalDoNotDeliverBefore check\"] =  Date(Order.originalDoNotDeliverBefore) ==  Date(CreationRequest.originalDoNotDeliverBefore);",
-									"tests[\"Order externalReference check\"] = Order.externalReference ===  pm.environment.get(\"ExternalReference\");",
+									"if (responseBody != \"[]\")",
+									"{",
+									"    var Order = json[0];",
+									"    var orderId = pm.environment.get(\"NewOrderID\");",
+									"    var temp = pm.environment.get(\"OrderCreaterequest\");",
+									"    var CreationRequest = JSON.parse(temp);",
+									"    ",
+									"    tests[\"Order Id check\"] = Order.id === orderId;",
+									"    tests[\"Order description check\"] = Order.description === (CreationRequest.description+\" Updated\");",
+									"    tests[\"Order customer check\"] = Order.customer === CreationRequest.customer;",
+									"    tests[\"Order billable customer check\"] = Order.billableCustomerId === CreationRequest.customer;",
+									"    tests[\"Order originalDue check\"] = Date(Order.originalDue) ==   Date(CreationRequest.originalDue);",
+									"    tests[\"Order originalDoNotDeliverBefore check\"] =  Date(Order.originalDoNotDeliverBefore) ==  Date(CreationRequest.originalDoNotDeliverBefore);",
+									"    tests[\"Order externalReference check\"] = Order.externalReference ===  pm.environment.get(\"ExternalReference\");",
+									"}",
+									"else",
+									"{",
+									"    ",
+									"    tests[\"Order not found\"] = false;",
+									"}",
 									"}",
 									"",
 									""
@@ -1790,7 +2467,10 @@
 								"value": "text/plain, application/json, text/json"
 							}
 						],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{OrderAPIHost}}/v1/orders/{{NewOrderID}}?cancellationReason=INVALID_ORDER_DATA",
 							"host": [
@@ -1822,6 +2502,229 @@
 		{
 			"name": "DeliveryJobs",
 			"item": [
+				{
+					"name": "GET /v1/deliveryjobs/fororder/$id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52c5eda7-9a21-459c-87e5-18408e188f97",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									"    var json = JSON.parse(responseBody);",
+									"    var DeliveryJob = json[0];",
+									"    var temp = pm.environment.get(\"OrderCreaterequest\");",
+									"var CreationRequest = JSON.parse(temp);",
+									"tests[\"DeliveryJob targetCustomerId check\"] = DeliveryJob.targetCustomerId === CreationRequest.deliveryJobs[0].targetCustomerId;",
+									"tests[\"DeliveryJob targetTerritory check\"] = DeliveryJob.targetTerritory === CreationRequest.deliveryJobs[0].targetTerritory;",
+									"tests[\"DeliveryJob targetLanguage check\"] = DeliveryJob.targetLanguage === CreationRequest.deliveryJobs[0].targetLanguage;",
+									"tests[\"DeliveryJob contentOwnerId check\"] = DeliveryJob.contentOwnerId === CreationRequest.deliveryJobs[0].contentOwnerId;",
+									"tests[\"DeliveryJob doNotDeliverBefore check\"] = Date(DeliveryJob.doNotDeliverBefore) === Date(CreationRequest.deliveryJobs[0].doNotDeliverBefore);",
+									"tests[\"DeliveryJob availabilityStart check\"] = Date(DeliveryJob.availabilityStart) === Date(CreationRequest.deliveryJobs[0].availabilityStart);",
+									"tests[\"DeliveryJob availabilityEnd check\"] = Date(DeliveryJob.availabilityEnd) === Date(CreationRequest.deliveryJobs[0].availabilityEnd);",
+									"tests[\"DeliveryJob allowProcessing check\"] = DeliveryJob.allowProcessing === CreationRequest.deliveryJobs[0].allowProcessing;",
+									"tests[\"DeliveryJob allowPackaging check\"] = DeliveryJob.allowPackaging === CreationRequest.deliveryJobs[0].allowPackaging;",
+									"tests[\"DeliveryJob allowDelivery check\"] = DeliveryJob.allowDelivery === CreationRequest.deliveryJobs[0].allowDelivery;",
+									"tests[\"DeliveryJob deliveryJobType check\"] = DeliveryJob.deliveryJobType === CreationRequest.deliveryJobs[0].deliveryJobType;",
+									"tests[\"DeliveryJob customer check\"] = DeliveryJob.customer === CreationRequest.deliveryJobs[0].customer;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/fororder/{{ClonedOrderID}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"fororder",
+								"{{ClonedOrderID}}"
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/deliveryjobs/stuck/checkAll",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f57aa783-ecd3-4dbd-9e59-b2b89495b3fe",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "82a73cbc-8583-4708-8fd9-5fbc6a9265a3",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									"var json = JSON.parse(responseBody);",
+									"tests[\"Check hasErrors\"] = json.hasErrors === false;",
+									"tests[\"Check Validation message\"] = _.isEmpty(json.validationMessages);   ",
+									"pm.environment.set(\"DeliveryJob_StuckCount\", json.value);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/stuck/checkAll",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"stuck",
+								"checkAll"
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/deliveryjobs/checkDndb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52c5eda7-9a21-459c-87e5-18408e188f97",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e4c31595-1cd0-421f-9f5b-81303906d94e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/checkDndb",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"checkDndb"
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/deliveryjobs/stuck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52c5eda7-9a21-459c-87e5-18408e188f97",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									"    var count = pm.environment.get(\"DeliveryJob_StuckCount\");",
+									"    var json = JSON.parse(responseBody);",
+									"    tests[\"Check Total count\"] = json.totalCount === count;",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/stuck",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"stuck"
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
+					},
+					"response": []
+				},
 				{
 					"name": "GET /v1/deliveryjobs/blockedDndb",
 					"event": [
@@ -1902,6 +2805,304 @@
 							]
 						},
 						"description": "Performs consistency check on all delivery jobs."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/deliveryjobs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52c5eda7-9a21-459c-87e5-18408e188f97",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code === 201;",
+									"",
+									"if (responseCode.code === 201)",
+									"{",
+									" console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"New_DJ_id\", jsonData.value.split(\":\")[4]);",
+									" tests[\"Has error check\"] = jsonData.hasErrors === false;",
+									" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0;   ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7a9d3db1-e2d4-4274-9992-3ac82f0b0fbb",
+								"exec": [
+									"function makeid() {",
+									"  var text = \"\";",
+									"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+									"",
+									"  for (var i = 0; i < 16; i++)",
+									"    text += possible.charAt(Math.floor(Math.random() * possible.length));",
+									"",
+									"  return text;",
+									"}",
+									"",
+									"var DueDate = new Date();",
+									"var DNDBDate = new Date();",
+									"var AvaliabilityStart = new Date();",
+									"var AvaliabilityEnd = new Date();",
+									"",
+									"",
+									"DueDate.setMinutes(DueDate.getMinutes() + 50); // 5 min+",
+									"DNDBDate.setMinutes(DNDBDate.getMinutes() + 10); // 10 min+",
+									"AvaliabilityStart.setHours(AvaliabilityStart.getHours() + 2); // 2 hours+",
+									"AvaliabilityEnd.setMonth(AvaliabilityEnd.getMonth() + 1); // 1 month+",
+									"",
+									"",
+									"pm.environment.set(\"DJ_DueDate\", DueDate.toISOString());",
+									"pm.environment.set(\"DJ_DNDBDate\", DNDBDate.toISOString());",
+									"pm.environment.set(\"AvailabilityStart\", AvaliabilityStart.toISOString());",
+									"pm.environment.set(\"AvailabilityEnd\", AvaliabilityEnd.toISOString()); ",
+									"",
+									"",
+									"var json = '{       \"customerPackageProfile\": \"ssa-nl168\",       \"customerWorkflow\": \"FirstTimePublish\",       \"targetCustomer\": \"44d741fd\",       \"targetCustomerId\": null,       \"targetTerritory\": \"IRL\",       \"targetLanguage\": \"eng\",       \"contentOwnerId\": \"e3b59a42\",       \"doNotDeliverBefore\": \"'+DNDBDate.toISOString()+'\",       \"availabilityStart\": \"'+AvaliabilityStart.toISOString()+'\",       \"availabilityEnd\": \"'+AvaliabilityEnd.toISOString()+'\",       \"allowProcessing\": true,       \"allowPackaging\": true,       \"allowDelivery\": true,       \"deliveryJobType\": \"AUTOMATIC\",       \"customer\": \"44d741fd\",       \"description\": \"123test\",       \"titleId\": \"AWUxwBLXF_AfgjR72RFb\",       \"titleVersion\": \"AWUzlEms6FbSZ_x5fb9A\",       \"due\": \"'+DueDate.toISOString()+'\",       \"details\": {         \"LGI_OrderOrigin\": \"Picklist\",         \"LicenseID\": \"11\",         \"Operator\": \"IE_Virgin\",         \"Contract\": \"Sony TVoD - UPC IE (2015-18)\",         \"OrderingResolutionRight\": \"HD\",         \"DeliveryResolution\": \"HD\",         \"YearOfProduction\": \"2017\",         \"CountriesOfProduction\": \"USA\",         \"ExternalLicenseID\": \"11\",         \"Studio\": \"Sony\",         \"SubtitleLanguage\": \"eng\",         \"AudioLanguage\": \"eng\",         \"UniqueProgramID\": \"52369_IRELAND_eng\",         \"AudioFormat\": \"OV with subtitles,HOH subtitles\",         \"ProducedLanguage\": \"eng\",         \"SimsTitleID\": \"\",         \"SimsClearanceID\": \"\",         \"SubScriptionType\": \"TVOD\",         \"ViewingPeriod\": \"48\",         \"AlternativeName\": \"\",         \"Genre\": \"movie/family\",         \"Relicense\": \"No\",         \"OrionFlag\": \"STB\",         \"RunTime\": \"02:00:00\",         \"ContractTitleCategory\": \"D&D\",         \"DownloadToGoDuration\": \"\",         \"ExpiryAfterPlayDuration\": \"\",         \"MaxActiveDownloads\": \"\",         \"StudioLicenseID\": \"BW78561289\",         \"EPGCategories\": \"IRELAND/DATA/TVOD/MOVIES\"       }     } ';",
+									"",
+									"pm.environment.set(\"DJ_Createrequest\", json);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{DJ_Createrequest}}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs"
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/deliveryjobs/$id/overrideSLA",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52c5eda7-9a21-459c-87e5-18408e188f97",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e4c31595-1cd0-421f-9f5b-81303906d94e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/:id/overrideSLA?newSla=p12&note=Postman_SLA",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								":id",
+								"overrideSLA"
+							],
+							"query": [
+								{
+									"key": "newSla",
+									"value": "p12"
+								},
+								{
+									"key": "note",
+									"value": "Postman_SLA"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{New_DJ_id}}"
+								}
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/deliveryjobs/$id/history?take=500",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d84ed175-c461-403f-912b-a48fca257733",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"console.log(\"Response: \"+responseBody);",
+									"if (responseCode.code === 200 )",
+									"{",
+									"var jsonData = JSON.parse(responseBody);",
+									"if (jsonData.results.count !== 0 )",
+									"    {",
+									"        var DJID = pm.environment.get(\"New_DJ_id\");",
+									"        tests[\"totalCount is not a 0\"] = true;",
+									"        ",
+									"        ",
+									"        for (var count = 0; count < jsonData.totalCount; count++)",
+									"        {",
+									"            var entity = jsonData.results[count].entity;",
+									"            tests[\"Validate record id for record \"+ count] = jsonData.results[count].id == (DJID + '.'+ jsonData.results[count].baseVersion);",
+									"        }",
+									"    }",
+									"    else tests[\"totalCount is not a 0\"] = false;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/{{New_DJ_id}}/history?take=500",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"{{New_DJ_id}}",
+								"history"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "{{skip}}",
+									"disabled": true
+								},
+								{
+									"key": "take",
+									"value": "500"
+								}
+							]
+						},
+						"description": "Returns a range of changes applied to specified order."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /v1/deliveryjobs/$id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52c5eda7-9a21-459c-87e5-18408e188f97",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									"    var DeliveryJob = JSON.parse(responseBody);",
+									"    var temp = pm.environment.get(\"DJ_Createrequest\");",
+									"var CreationRequest = JSON.parse(temp);",
+									"tests[\"DeliveryJob targetCustomerId check\"] = DeliveryJob.targetCustomerId === CreationRequest.targetCustomerId;",
+									"tests[\"DeliveryJob targetTerritory check\"] = DeliveryJob.targetTerritory === CreationRequest.targetTerritory;",
+									"tests[\"DeliveryJob targetLanguage check\"] = DeliveryJob.targetLanguage === CreationRequest.targetLanguage;",
+									"tests[\"DeliveryJob contentOwnerId check\"] = DeliveryJob.contentOwnerId === CreationRequest.contentOwnerId;",
+									"tests[\"DeliveryJob doNotDeliverBefore check\"] = Date(DeliveryJob.doNotDeliverBefore) === Date(CreationRequest.doNotDeliverBefore);",
+									"tests[\"DeliveryJob availabilityStart check\"] = Date(DeliveryJob.availabilityStart) === Date(CreationRequest.availabilityStart);",
+									"tests[\"DeliveryJob availabilityEnd check\"] = Date(DeliveryJob.availabilityEnd) === Date(CreationRequest.availabilityEnd);",
+									"tests[\"DeliveryJob allowProcessing check\"] = DeliveryJob.allowProcessing === CreationRequest.allowProcessing;",
+									"tests[\"DeliveryJob allowPackaging check\"] = DeliveryJob.allowPackaging === CreationRequest.allowPackaging;",
+									"tests[\"DeliveryJob allowDelivery check\"] = DeliveryJob.allowDelivery === CreationRequest.allowDelivery;",
+									"tests[\"DeliveryJob deliveryJobType check\"] = DeliveryJob.deliveryJobType === CreationRequest.deliveryJobType;",
+									"tests[\"DeliveryJob customer check\"] = DeliveryJob.customer === CreationRequest.customer;",
+									"tests[\"DeliveryJob SLA Override check\"] = DeliveryJob.sla === \"P12\";",
+									"tests[\"DeliveryJob SLA Override check\"] = DeliveryJob.slaOverrideNote === \"Postman_SLA\";",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/deliveryjobs/{{New_DJ_id}}",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliveryjobs",
+								"{{New_DJ_id}}"
+							]
+						},
+						"description": "Returns all jobs currently blocked by do-not-deliver-before dates."
 					},
 					"response": []
 				}
@@ -2293,6 +3494,419 @@
 						"description": "Returns a range of changes applied to specified licensing job."
 					},
 					"response": []
+				},
+				{
+					"name": "GET /v1/licensingjobs/$LicenseId",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4c2d83e4-9e2b-4408-8a00-df0105997bf7",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a989a54-e9e6-4589-97d5-22f82196502a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/licensingjobs/?id",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"licensingjobs",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Returns full information about specified licensing job."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Jobs",
+			"item": [
+				{
+					"name": "POST /v1/jobs/find",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9953d4ee-fac3-4645-9691-e98db773efb9",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var resultCount = parseInt(pm.environment.get(\"PageSize\"));",
+									"//Check that all required statuses are present",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//check Jobs count",
+									"var Results = jsonData.results;",
+									"if (jsonData.totalCount >= resultCount)  tests[\"Check Page size\"] = Results.length === resultCount;  ",
+									"",
+									"//check that license job is license job =)",
+									"for (var count = 0; count < Results.length; count++)",
+									"{",
+									"    var Job = Results[count];",
+									"    tests[\"Check Order ID \"+count] = Job.orderUrn.includes(\"order\");",
+									"    tests[\"Validate Job \"+count] = Job.allowProcessing === true;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": {{PageSize}},\r\n  \"query\": \"{\\\"bool\\\": {\\\"must\\\" : [{\\\"terms\\\" : {\\\"allowProcessing\\\" : [\\\"true\\\"] } }]}}\"\r\n  \r\n}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/jobs/find",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/jobs/findForOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb88fc6b-9a21-4be6-bfe2-c59ce8680959",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var resultCount = parseInt(pm.environment.get(\"PageSize\"));",
+									"//Check that all required statuses are present",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//check Jobs count",
+									"var Results = jsonData.results;",
+									"if (jsonData.totalCount >= resultCount)  tests[\"Check Page size\"] = Results.length === resultCount;  ",
+									"",
+									"var OrderID = pm.environment.get(\"NewOrderID\");",
+									"",
+									"for (var count = 0; count < Results.length; count++)",
+									"{",
+									"    var Job = Results[count];",
+									"    tests[\"Check Order ID \"+count] = Job.orderId == OrderID;",
+									"    console.log(Job.orderId +\" || \"+ OrderID);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": {{PageSize}},\r\n  \"orderId\": \"{{NewOrderID}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/jobs/findForOrder",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"findForOrder"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/jobs/deletebatch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9953d4ee-fac3-4645-9691-e98db773efb9",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var Results = JSON.parse(responseBody);",
+									"ID = pm.environment.get(\"DeliveryJobID\");",
+									" ",
+									"",
+									"//check that license job is license job =)",
+									"for (var count = 0; count < Results.length; count++)",
+									"{",
+									"tests[\"Check Job ID\"] = Results[count].jobId == ID;",
+									"tests[\"Check canDelete\"] = Results[count].canDelete === true;",
+									"tests[\"Check deleted\"] = Results[count].deleted === true;",
+									"tests[\"Check reason\"] = Results[count].reason == \"\";",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"jobsInfos\": [\r\n    {\r\n      \"id\": \"{{DeliveryJobID}}\",\r\n      \"type\": \"Delivery\"\r\n    }\r\n  ],\r\n  \"reason\": \"Postman Test\"\r\n}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/jobs/deletebatch",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"deletebatch"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f3d85a51-dafa-4ad3-8dca-40a55bc5f79a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c8462d01-5e74-45f8-bd3d-65065cf8740e",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "JobsSearch",
+			"item": [
+				{
+					"name": "POST /v1/jobssearch/find",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9953d4ee-fac3-4645-9691-e98db773efb9",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var resultCount = parseInt(pm.environment.get(\"PageSize\"));",
+									"//Check that all required statuses are present",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//check Jobs count",
+									"var Results = jsonData.results;",
+									"if (jsonData.totalCount >= resultCount)  tests[\"Check Page size\"] = Results.length === resultCount;  ",
+									"",
+									"//check that license job is license job =)",
+									"for (var count = 0; count < Results.length; count++)",
+									"{",
+									"    var Job = Results[count];",
+									"    tests[\"Check Order ID \"+count] = Job.orderUrn.includes(\"order\");",
+									"    tests[\"Validate Job \"+count] = Job.stage == \"AWAITING_SOURCES\";",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": {{PageSize}},\r\n  \"query\": \"{\\\"bool\\\": {\\\"must\\\" : [{\\\"terms\\\" : {\\\"stage\\\" : [\\\"awaiting_sources\\\"] } }]}}\"\r\n  \r\n}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/jobssearch/find",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"jobssearch",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /v1/jobs/findForOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "30f25b3c-322e-4b41-948b-0fc4d5970679",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var resultCount = parseInt(pm.environment.get(\"PageSize\"));",
+									"//Check that all required statuses are present",
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//check Jobs count",
+									"var Results = jsonData.results;",
+									"if (jsonData.totalCount >= resultCount)  tests[\"Check Page size\"] = Results.length === resultCount;  ",
+									"",
+									"var OrderID = pm.environment.get(\"ClonedOrderID\");",
+									"",
+									"for (var count = 0; count < Results.length; count++)",
+									"{",
+									"    var Job = Results[count];",
+									"    tests[\"Check Order ID \"+count] = Job.orderId == OrderID;",
+									"    console.log(Job.orderId +\" || \"+ OrderID);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": {{PageSize}},\r\n  \"orderId\": \"{{ClonedOrderID}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/jobssearch/findForOrder",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"jobssearch",
+								"findForOrder"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f3d85a51-dafa-4ad3-8dca-40a55bc5f79a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c8462d01-5e74-45f8-bd3d-65065cf8740e",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},

@@ -1,0 +1,2514 @@
+{
+	"info": {
+		"_postman_id": "6977a59e-e9ac-4e45-9431-bc5192fdb2dc",
+		"name": "Deluxe.Orders.Reports API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DeliverablesReport",
+			"item": [
+				{
+					"name": "Performs search query for deliverables report lines.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b12b6b92-ec7f-4c00-9f79-52a7fc8d7a01",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData.results[0].id)",
+									" pm.environment.set(\"Deliverable_report_line\", jsonData.results[0]);",
+									"//  var one = pm.environment.get(\"Deliverable_report_line\");",
+									"//  console.log(one.id);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns deliverables report line with Id(DeliverableId).",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9b364a54-f00d-47d8-8d15-ed23dc8e9f4f",
+								"exec": [
+									"var report_line = pm.environment.get(\"Deliverable_report_line\");",
+									"pm.environment.set(\"line_id\", report_line.id);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c3d7e55e-9e8d-4bf6-aedc-1b8556a7d6f0",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Cehck id\"] = jsonData.id === pm.environment.get(\"line_id\");",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/{{line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"{{line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocess deliverables report lines for delivery job.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e14e43ca-a1bd-4f0f-8ff9-5029ef9c33e6",
+								"exec": [
+									"var delivery_job_id = pm.environment.get(\"Deliverable_report_line\");",
+									"pm.environment.set(\"Delivery_job_id\", delivery_job_id.jobId);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "90a808da-6fc2-49d9-8c17-eff3264e55d1",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/reprocessDeliveryJob/{{Delivery_job_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"reprocessDeliveryJob",
+								"{{Delivery_job_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerates part of (or whole) report. Operation is asynchronous.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2d14058a-51be-4856-8bc5-0ceeb9287639",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"from\": \"{{DNDBDate}}\",\r\n  \"to\": \"{{DueDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/regenerate",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"regenerate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for records found with search parameters.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4b185d37-e125-42a6-bd43-262fb5dbabc6",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 10,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/exportToExcelBySearch",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"exportToExcelBySearch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for jobs submitted in date range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "94f569cc-365f-4251-a0f4-ab6ab3f9e22f",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"from\": \"{{DNDBDate}}\",\r\n  \"to\": \"{{DueDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/exportToExcelByDateRange",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"exportToExcelByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletes deliverables report line.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c885f802-4f5b-4eb4-a490-c10d82ab161b",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/{{line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"{{line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns deliverables report line with Id(DeliverableId). Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9b364a54-f00d-47d8-8d15-ed23dc8e9f4f",
+								"exec": [
+									"// var report_line = pm.environment.get(\"Deliverable_report_line\");",
+									"// pm.environment.set(\"line_id\", report_line.id);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c3d7e55e-9e8d-4bf6-aedc-1b8556a7d6f0",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/{{line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"{{line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checks Deliverables Report consistency. (Removes lines for non existing Orders/Jobs)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bfe81c6e-62f7-49b5-8048-d64486123f51",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/deliverablesReport/check",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"deliverablesReport",
+								"check"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "FulfillmentReport",
+			"item": [
+				{
+					"name": "Performs search query for fulfillment report lines.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "878abbee-10dd-4e3b-b52a-3355e93cacec",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData.results[0].id)",
+									" pm.environment.set(\"Fulfillment_Report_line\", jsonData.results[0]);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns fulfillment report line with Id(JobId).",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "18e816fd-ac0f-4bc6-939a-b3c0623e6ad0",
+								"exec": [
+									"var fulfillment_Report_line = pm.environment.get(\"Fulfillment_Report_line\")",
+									"pm.environment.set(\"fulfillment_Report_line_id\", fulfillment_Report_line.id)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "218f27ff-0a1b-475f-87d6-3b09424bd6c2",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Cehck id\"] = jsonData.id === pm.environment.get(\"fulfillment_Report_line_id\");",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/{{fulfillment_Report_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"{{fulfillment_Report_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocess fulfillment report line for delivery job.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "cc1bd397-a33c-42fc-a64d-9bd097d5fef9",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "f43b035f-bf5d-4c83-8245-52b3ab214d8c",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/reprocessDeliveryJob/{{fulfillment_Report_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"reprocessDeliveryJob",
+								"{{fulfillment_Report_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerates part of (or whole) report. Operation is asynchronous.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2cd66ed9-2f2d-485c-86f7-565afa49da82",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"from\": \"{{DNDBDate}}\",\r\n  \"to\": \"{{DueDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/regenerate",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"regenerate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for records found with search parameters.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ead17aef-1aa7-4884-870a-65a7dc3c414d",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 10,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/exportToExcelBySearch",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"exportToExcelBySearch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for jobs submitted in date range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8d662ab-a255-4f49-8b77-e86451e4dd42",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"from\": \"{{DNDBDate}}\",\r\n  \"to\": \"{{DueDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/exportToExcelByDateRange",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"exportToExcelByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletes fulfillment report line.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "80c6678b-94b6-44d3-be0c-0df59ecb61c4",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/{{fulfillment_Report_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"{{fulfillment_Report_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns fulfillment report line with Id(JobId). Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "18e816fd-ac0f-4bc6-939a-b3c0623e6ad0",
+								"exec": [
+									"var fulfillment_Report_line = pm.environment.get(\"Fulfillment_Report_line\")",
+									"pm.environment.set(\"fulfillment_Report_line_id\", fulfillment_Report_line.id)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "218f27ff-0a1b-475f-87d6-3b09424bd6c2",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/{{fulfillment_Report_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"{{fulfillment_Report_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checks Fulfillment Report consistency. (Removes lines for non existing Orders/Jobs)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5307edb8-3e83-43ea-9526-adb5fc256a54",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/fulfillmentReport/check",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"fulfillmentReport",
+								"check"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LgiOrderReport",
+			"item": [
+				{
+					"name": "Performs search query for lgi order report lines.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cfebc14a-9d3f-4d87-91fa-4ff830f83d14",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData.results[0].id)",
+									" pm.environment.set(\"LgiOrderReport_line\", jsonData.results[0]);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns lgi order report line with Id.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9d534fb2-898d-4330-a1dc-327b2bc39425",
+								"exec": [
+									"var lgiOrderReport_line = pm.environment.get(\"LgiOrderReport_line\")",
+									"pm.environment.set(\"LgiOrderReport_line_id\", lgiOrderReport_line.id)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c575fab-f257-4042-84b0-26857cecb37e",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Cehck id\"] = jsonData.id === pm.environment.get(\"LgiOrderReport_line_id\");",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/{{LgiOrderReport_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"{{LgiOrderReport_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocess lgi order report line for Offer.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7d175296-ea36-42bc-a0cd-826b573c8837",
+								"exec": [
+									"var lgiOrderReport_offer = pm.environment.get(\"LgiOrderReport_line\")",
+									"pm.environment.set(\"LgiOrderReport_line_OfferID\", lgiOrderReport_offer.offerId)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "925d8139-66be-4fef-8405-5c4418abd962",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/reprocessOffer/{{LgiOrderReport_line_OfferID}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"reprocessOffer",
+								"{{LgiOrderReport_line_OfferID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocess lgi order report line for job.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b866b2b2-fa04-4b07-8162-8928c5669ba3",
+								"exec": [
+									"var lgiOrderReport_Line_Item = pm.environment.get(\"LgiOrderReport_line\")",
+									"pm.environment.set(\"LgiOrderReport_line_itemID\", lgiOrderReport_Line_Item.lineItemId)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/reprocessJob/{{LgiOrderReport_line_itemID}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"reprocessJob",
+								"{{LgiOrderReport_line_itemID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query for lgi order report lines. Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cfebc14a-9d3f-4d87-91fa-4ff830f83d14",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData.results[0].id)",
+									" pm.environment.set(\"New_LgiOrderReport_line\", jsonData.results[0]);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletes Lgi Order report line.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8e5a00e4-4101-4378-9f66-9cb4595f30e5",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9f3ef470-55d2-493d-9180-f445c88748ec",
+								"exec": [
+									"var new_lgiOrderReport_line = pm.environment.get(\"New_LgiOrderReport_line\")",
+									"pm.environment.set(\"New_LgiOrderReport_line_id\", new_lgiOrderReport_line.id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/{{New_LgiOrderReport_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"{{New_LgiOrderReport_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns lgi order report line with Id. Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9d534fb2-898d-4330-a1dc-327b2bc39425",
+								"exec": [
+									"var lgiOrderReport_line = pm.environment.get(\"LgiOrderReport_line\")",
+									"pm.environment.set(\"LgiOrderReport_line_id\", lgiOrderReport_line.id)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c575fab-f257-4042-84b0-26857cecb37e",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/{{New_LgiOrderReport_line}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"{{New_LgiOrderReport_line}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerates part of (or whole) report. Operation is asynchronous.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cdd03eef-1a11-4688-ad1f-5542bd5ad5cf",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"from\": \"{{DNDBDate}}\",\r\n  \"to\": \"{{DueDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/regenerate",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"regenerate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for records found with search parameters.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "25274c87-6393-41a7-afe5-9ab5a5d8564e",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 10,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/exportToExcelBySearch",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"exportToExcelBySearch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for jobs submitted in date range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b29f13de-ab20-417b-946b-84052876cc8a",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"from\": \"2019-01-01T10:38:34.893Z\",\r\n  \"to\": \"{{ShippingDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/exportToExcelByDateRange",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"exportToExcelByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checks LgiOrder Report consistency. (Removes lines for non existing Orders/Jobs)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ce38ac72-004f-414e-9a42-55a53758ca55",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/lgiorderReport/check",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"lgiorderReport",
+								"check"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PeriodicReportsProcessing",
+			"item": [
+				{
+					"name": "Returns list of Stubs report lines to process.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ca5c52e1-55fe-4586-857f-0bbad8751ec0",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/periodicReportsProcessing/stubsLinesToProcess",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"periodicReportsProcessing",
+								"stubsLinesToProcess"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns list of Deliverables report lines to process.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "27be2efd-9b68-4d72-aaf0-10dee1c1a11f",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/periodicReportsProcessing/deliverablesLinesToProcess",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"periodicReportsProcessing",
+								"deliverablesLinesToProcess"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns list of Lgi Order report lines to process.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8218b926-03f8-4163-8162-63938afbe71b",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/periodicReportsProcessing/lgiOrderLinesToProcess",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"periodicReportsProcessing",
+								"lgiOrderLinesToProcess"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns list of Fulfillment report lines to process.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "749ce33e-1927-4986-840a-df92c40f365a",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/periodicReportsProcessing/fulfillmentLinesToProcess",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"periodicReportsProcessing",
+								"fulfillmentLinesToProcess"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Processes pending reports updates.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5a9f872b-c15a-46b6-ab95-d9f324700286",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/periodicReportsProcessing/processUpdates",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"periodicReportsProcessing",
+								"processUpdates"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ReportExportConventions",
+			"item": [
+				{
+					"name": "Creates new report export conventions.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "37f49c56-824c-43de-9f2b-80753c281fc8",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code === 201;",
+									"//Check each property",
+									"if (responseCode.code === 201)",
+									"{",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"New_report_export_convention\", jsonData);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Test_name\",\r\n  \"reportFileName\": \"Test_reportFileName\",\r\n  \"columnConventions\": [\r\n    {\r\n      \"order\": 10,\r\n      \"fieldName\": \"Test_fieldName\",\r\n      \"columnName\": \"Test_columnName\"\r\n    }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns report export conventions with id.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "26d6ce54-94fa-435c-9224-92138cdde03a",
+								"exec": [
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 5000);//wait 5 sec",
+									"console.log(\"Waiting Finished\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "af095129-a65b-421f-8524-973052926f67",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//console.log(pm.environment.get(\"New_report_export_convention\"))",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Check id\"] = jsonData.id === pm.environment.get(\"New_report_export_convention\");",
+									" pm.environment.set(\"Name_of_report_export_convention\", jsonData.name);",
+									" console.log(pm.environment.get(\"Name_of_report_export_convention\"))",
+									" console.log(jsonData.name)",
+									" tests[\"Check name\"] = jsonData.name === pm.environment.get(\"Name_of_report_export_convention\");",
+									" tests[\"Check reportFileName\"] = jsonData.reportFileName === \"Test_reportFileName\";",
+									" tests[\"Check order\"] = jsonData.columnConventions[0].order === 10;",
+									" tests[\"Check fieldName\"] = jsonData.columnConventions[0].fieldName === \"Test_fieldName\";",
+									" tests[\"Check columnName\"] = jsonData.columnConventions[0].columnName === \"Test_columnName\";",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions/{{New_report_export_convention}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions",
+								"{{New_report_export_convention}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Finds report export conventions by JobId.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1a07dfaa-67f2-43a4-a975-245f41220bb0",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Check id\"] = jsonData.id === pm.environment.get(\"New_report_export_convention\");",
+									" //pm.environment.set(\"Name_of_report_export_convention\", jsonData.name);",
+									" //console.log(pm.environment.get(\"Name_of_report_export_convention\"))",
+									" //console.log(jsonData.name)",
+									" tests[\"Check name\"] = jsonData.name === pm.environment.get(\"Name_of_report_export_convention\");",
+									" tests[\"Check reportFileName\"] = jsonData.reportFileName === \"Test_reportFileName\";",
+									" tests[\"Check order\"] = jsonData.columnConventions[0].order === 10;",
+									" tests[\"Check fieldName\"] = jsonData.columnConventions[0].fieldName === \"Test_fieldName\";",
+									" tests[\"Check columnName\"] = jsonData.columnConventions[0].columnName === \"Test_columnName\";",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions/byName/{{Name_of_report_export_convention}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions",
+								"byName",
+								"{{Name_of_report_export_convention}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query for report export conventions.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "183a6b5f-106b-4b21-a5b5-c87ccfadc523",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Check id\"] = jsonData.results[0].id === pm.environment.get(\"New_report_export_convention\");",
+									" //pm.environment.set(\"Name_of_report_export_convention\", jsonData.name);",
+									" //console.log(pm.environment.get(\"Name_of_report_export_convention\"))",
+									" //console.log(jsonData.name)",
+									" tests[\"Check name\"] = jsonData.results[0].name === pm.environment.get(\"Name_of_report_export_convention\");",
+									" tests[\"Check reportFileName\"] = jsonData.results[0].reportFileName === \"Test_reportFileName\";",
+									" tests[\"Check order\"] = jsonData.results[0].columnConventions[0].order === 10;",
+									" tests[\"Check fieldName\"] = jsonData.results[0].columnConventions[0].fieldName === \"Test_fieldName\";",
+									" tests[\"Check columnName\"] = jsonData.results[0].columnConventions[0].columnName === \"Test_columnName\";",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Updates existing Report Export Conventions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f745f77b-32ba-48ba-a6c1-a800cb2406ea",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{New_report_export_convention}}\",\r\n  \"version\": 1,\r\n  \"name\": \"Updated_Test_name\",\r\n  \"reportFileName\": \"Updated_Test_reportFileName\",\r\n  \"columnConventions\": [\r\n    {\r\n      \"order\": 20,\r\n      \"fieldName\": \"Updated_Test_fieldName\",\r\n      \"columnName\": \"Updated_Test_columnName\"\r\n    }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletes report export conventions.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c723efd2-936b-49bc-a4fa-9c02341b0d77",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions/{{New_report_export_convention}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions",
+								"{{New_report_export_convention}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns report export conventions with id. Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52bccd26-ec47-41da-8956-8055adfbf0fa",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/exportConventions/{{New_report_export_convention}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"exportConventions",
+								"{{New_report_export_convention}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "StubsReport",
+			"item": [
+				{
+					"name": "Performs search query for stubs report lines.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3f41a7ae-1d52-4ac1-9c8c-c1abbfc372f0",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData.results[0].id)",
+									" pm.environment.set(\"Stubs_report_line\", jsonData.results[0]);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5a6aec0a-1661-4841-a657-89a55b975534",
+								"exec": [
+									"var stubs_report_line_jobid = pm.environment.get(\"Stubs_report_line\")",
+									"pm.environment.set(\"Stubs_report_line_jobid\", stubs_report_line_jobid.jobId)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "008904ba-84a0-45c5-93dc-075dd63e539a",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" var compare =  pm.environment.get(\"Stubs_report_line\")",
+									"",
+									" tests[\"Check jobID\"] = compare.jobId === pm.environment.get(\"Stubs_report_line_jobid\")",
+									" ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/forJob/{{Stubs_report_line_jobid}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"forJob",
+								"{{Stubs_report_line_jobid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocess stubs report line for delivery job.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dba713ba-aff8-440a-9746-ace86d4f9128",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/reprocessDeliveryJob/{{Stubs_report_line_jobid}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"reprocessDeliveryJob",
+								"{{Stubs_report_line_jobid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerates part of (or whole) report. Operation is asynchronous.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f462018f-8eb8-4473-8b0f-c84188a9edb1",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"from\": \"2019-01-01T10:40:59.488Z\",\r\n  \"to\": \"{{DueDate}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/regenerate",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"regenerate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for records found with search parameters.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d80cee7-f21d-45e4-ace4-5a2800d66cd1",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 10,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/exportToExcelBySearch",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"exportToExcelBySearch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generates excel report for jobs submitted in date range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11fe9a85-17e3-4e60-b973-1962dba6517e",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exportConventionsName\": \"\",\r\n  \"from\": \"2019-01-08T10:44:24.538Z\",\r\n  \"to\": \"2019-05-08T10:44:24.538Z\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/exportToExcelByDateRange",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"exportToExcelByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletes stubs report line.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7bb0a177-82b9-401d-a6ba-a7e632b74c4e",
+								"exec": [
+									"var stubs_report_line_id = pm.environment.get(\"Stubs_report_line\")",
+									"pm.environment.set(\"Stubs_report_line_id\", stubs_report_line_id.id)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "f68836bc-bce5-4562-9128-bdc99710f122",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/{{Stubs_report_line_id}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"{{Stubs_report_line_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query for stubs report lines. Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3f41a7ae-1d52-4ac1-9c8c-c1abbfc372f0",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData.results[0].id)",
+									" pm.environment.set(\"New_Stubs_report_line_new\", jsonData.results[0]);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 1,\r\n  \"query\": \"\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/find",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletes stubs report lines for job.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "92596ef3-629d-41ec-b1cd-cc53b8d41f23",
+								"exec": [
+									"var stubs_report_line_jobid = pm.environment.get(\"New_Stubs_report_line_new\")",
+									"pm.environment.set(\"Stubs_report_line_jobid_new\", stubs_report_line_jobid.jobId)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b42d6f36-5bc2-40cf-9be5-ab870d07ebcd",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/forJob/{{Stubs_report_line_jobid_new}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"forJob",
+								"{{Stubs_report_line_jobid_new}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": " Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5a6aec0a-1661-4841-a657-89a55b975534",
+								"exec": [
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 5000);//wait 5 sec",
+									"console.log(\"Waiting Finished\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "008904ba-84a0-45c5-93dc-075dd63e539a",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/forJob/{{Stubs_report_line_jobid_new}}",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"forJob",
+								"{{Stubs_report_line_jobid_new}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checks Stubs Report consistency. (Removes lines for non existing Orders/Jobs)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "eddf5551-2783-47fc-8090-5d7ed4d0a4f0",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{ReportsAPIHost}}/v1/stubsReport/check",
+							"host": [
+								"{{ReportsAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"stubsReport",
+								"check"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

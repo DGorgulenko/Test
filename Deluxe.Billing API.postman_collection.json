@@ -1,0 +1,1465 @@
+{
+	"info": {
+		"_postman_id": "8b99f4bb-d05f-42e4-a358-cd497e5cb7ed",
+		"name": "Deluxe.Billing API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consts",
+			"item": [
+				{
+					"name": "Returns a list of all supported billing model types.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4ae979ec-c0a4-4c2a-911a-4d2e684f9e19",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches SUBSCRIPTION_FLAT\"] = responseBody.has(\"SUBSCRIPTION_FLAT\");",
+									"tests[\"Body matches SUBSCRIPTION_PER_ITEM\"] = responseBody.has(\"SUBSCRIPTION_PER_ITEM\");",
+									"tests[\"Body matches NON_SUBSCRIPTION\"] = responseBody.has(\"NON_SUBSCRIPTION\");",
+									"",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 3 supported billing model types\"] = jsonData.length === 3;",
+									"",
+									"pm.environment.set(\"BillingModel\", jsonData[2]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/consts/billingModels",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"billingModels"
+							]
+						},
+						"description": "Returns a list of all supported billing model types."
+					},
+					"response": []
+				},
+				{
+					"name": "Returns a list of all supported billing model types.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "467a9c31-3d28-4101-8dd8-45b2238577ce",
+								"exec": [
+									"//Check Status Code",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check that all required statuses are present",
+									"tests[\"Body matches MAIN\"] = responseBody.has(\"MAIN\");",
+									"tests[\"Body matches ANCILLARY\"] = responseBody.has(\"ANCILLARY\");",
+									"",
+									"console.log(\"Response: \"+responseBody);",
+									"//check Json Parse",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Has 2 supported job line types\"] = jsonData.length === 2;",
+									"",
+									"pm.environment.set(\"JobLineType\", jsonData[1]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/consts/jobLineTypes",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"consts",
+								"jobLineTypes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BillableJobs",
+			"item": [
+				{
+					"name": "Create Order",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8b116a59-b5fc-4cb4-9e81-cd4ff9722e64",
+								"exec": [
+									"function makeid() {\r",
+									"  var text = \"\";\r",
+									"  var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";\r",
+									"\r",
+									"  for (var i = 0; i < 16; i++)\r",
+									"    text += possible.charAt(Math.floor(Math.random() * possible.length));\r",
+									"\r",
+									"  return text;\r",
+									"}\r",
+									"\r",
+									"var DueDate = new Date();\r",
+									"var DNDBDate = new Date();\r",
+									"var ShippingDate = new Date();\r",
+									"var AvaliabilityStart = new Date();\r",
+									"var AvaliabilityEnd = new Date();\r",
+									"var ExternalReference = makeid();\r",
+									"\r",
+									"DueDate.setMinutes(DueDate.getMinutes() + 50); // 5 min\r",
+									"DNDBDate.setMinutes(DNDBDate.getMinutes() + 10); // 10 min\r",
+									"ShippingDate.setDate(ShippingDate.getDate() + 1); // 1 day\r",
+									"AvaliabilityStart.setHours(AvaliabilityStart.getHours() + 2); // 2 hours\r",
+									"AvaliabilityEnd.setMonth(AvaliabilityEnd.getMonth() + 1); // 1 month\r",
+									"\r",
+									"\r",
+									"pm.environment.set(\"DueDate\", DueDate.toISOString());\r",
+									"pm.environment.set(\"DNDBDate\", DNDBDate.toISOString());\r",
+									"pm.environment.set(\"ShippingDate\",ShippingDate.toISOString());\r",
+									"pm.environment.set(\"AvailabilityStart\", AvaliabilityStart.toISOString());\r",
+									"pm.environment.set(\"AvailabilityEnd\", AvaliabilityEnd.toISOString()); \r",
+									"pm.environment.set(\"ExternalReference\", ExternalReference);\r",
+									"var json ='{   \"description\": \"Jumanji QA\",   \"customer\": \"44d741fd\",   \"originalDue\": \"'+DueDate.toISOString()+'\",   \"originalDoNotDeliverBefore\": \"'+DNDBDate.toISOString()+'\",   \"externalReference\": \"'+ExternalReference+'\",   \"deliveryJobs\": [     {       \"customerPackageProfile\": \"ssa-nl168\",       \"customerWorkflow\": \"FirstTimePublish\",       \"targetCustomer\": \"44d741fd\",       \"targetCustomerId\": null,       \"targetTerritory\": \"IRL\",       \"targetLanguage\": \"eng\",       \"contentOwnerId\": \"e3b59a42\",       \"doNotDeliverBefore\": \"'+DNDBDate.toISOString()+'\",       \"availabilityStart\": \"'+AvaliabilityStart.toISOString()+'\",       \"availabilityEnd\": \"'+AvaliabilityEnd.toISOString()+'\",       \"allowProcessing\": true,       \"allowPackaging\": true,       \"allowDelivery\": true,       \"deliveryJobType\": \"AUTOMATIC\",       \"customer\": \"44d741fd\",       \"description\": \"123test\",       \"titleId\": \"AWUxwBLXF_AfgjR72RFb\",       \"titleVersion\": \"AWUzlEms6FbSZ_x5fb9A\",       \"due\": \"'+DueDate.toISOString()+'\",       \"details\": {         \"LGI_OrderOrigin\": \"Picklist\",         \"LicenseID\": \"11\",         \"Operator\": \"IE_Virgin\",         \"Contract\": \"Sony TVoD - UPC IE (2015-18)\",         \"OrderingResolutionRight\": \"HD\",         \"DeliveryResolution\": \"HD\",         \"YearOfProduction\": \"2017\",         \"CountriesOfProduction\": \"USA\",         \"ExternalLicenseID\": \"11\",         \"Studio\": \"Sony\",         \"SubtitleLanguage\": \"eng\",         \"AudioLanguage\": \"eng\",         \"UniqueProgramID\": \"52369_IRELAND_eng\",         \"AudioFormat\": \"OV with subtitles,HOH subtitles\",         \"ProducedLanguage\": \"eng\",         \"SimsTitleID\": \"\",         \"SimsClearanceID\": \"\",         \"SubScriptionType\": \"TVOD\",         \"ViewingPeriod\": \"48\",         \"AlternativeName\": \"\",         \"Genre\": \"movie/family\",         \"Relicense\": \"No\",         \"OrionFlag\": \"STB\",         \"RunTime\": \"02:00:00\",         \"ContractTitleCategory\": \"D&D\",         \"DownloadToGoDuration\": \"\",         \"ExpiryAfterPlayDuration\": \"\",         \"MaxActiveDownloads\": \"\",         \"StudioLicenseID\": \"BW78561289\",         \"EPGCategories\": \"IRELAND/DATA/TVOD/MOVIES\"       }     }   ] }';\r",
+									"\r",
+									"pm.environment.set(\"OrderCreaterequest\", json);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "7a967332-c1c5-4f39-891a-fce6a0efa9c6",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code === 201;",
+									"//Check each property",
+									"if (responseCode.code === 201)",
+									"{",
+									" console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"NewOrderID_billable\", jsonData.value);",
+									" tests[\"Has error check\"] = jsonData.hasErrors === false;",
+									" tests[\"validationMessages check\"] = jsonData.validationMessages.length === 0;   ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{OrderCreaterequest}}"
+						},
+						"url": {
+							"raw": "{{OrderAPIHost}}/v1/orders",
+							"host": [
+								"{{OrderAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"orders"
+							]
+						},
+						"description": "Creates new order using provided data."
+					},
+					"response": []
+				},
+				{
+					"name": "Returns list of billable jobs for order.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ee49c3ff-7bb5-480c-b297-21c0858d3b6f",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"NewJobID_billable\", jsonData[0].id);",
+									" tests[\"Cehck order\"] = jsonData[0].orderId === pm.environment.get(\"NewOrderID_billable\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5d7e266e-a9e8-4aba-b0af-6c7d83a5781d",
+								"exec": [
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 9000);//wait 9 sec",
+									"console.log(\"Waiting Finished\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billablejobs/fororder/{{NewOrderID_billable}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billablejobs",
+								"fororder",
+								"{{NewOrderID_billable}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns billable job with given Id.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "02f2e12d-8596-48b3-b8f8-813d071118ae",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"createdAt_billableJob\", jsonData.createdAt);",
+									" tests[\"Check job\"] = jsonData.id === pm.environment.get(\"NewJobID_billable\");",
+									" tests[\"Check order\"] = jsonData.orderId === pm.environment.get(\"NewOrderID_billable\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billablejobs/{{NewJobID_billable}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billablejobs",
+								"{{NewJobID_billable}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Manually triggers delivery confirmation for billable job.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6126eb00-e448-486f-b94c-ee0dbcc9da75",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"if (responseCode.code != 200)",
+									"{",
+									"    console.log(\"ResponseCode.code: \" + responseCode.code)",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billablejobs/{{NewJobID_billable}}/confirmdelivery",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billablejobs",
+								"{{NewJobID_billable}}",
+								"confirmdelivery"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query on billable jobs.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1199c63c-39e7-42bd-a6b6-958dd4682ad9",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //pm.environment.set(\"NewJobID_billable\", jsonData[0].id);",
+									" tests[\"Check job\"] = jsonData.results[0].id === pm.environment.get(\"NewJobID_billable\");",
+									" tests[\"Check order\"] = jsonData.results[0].orderId === pm.environment.get(\"NewOrderID_billable\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9c313266-d341-48bc-b580-7bd5052266d9",
+								"exec": [
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 3000);//wait 5 sec",
+									"console.log(\"Waiting Finished\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 500,\r\n  \"query\": \"{\\\"bool\\\": {\\\"must\\\" : [{\\\"terms\\\" : {\\\"createdAt\\\" : [\\\"{{createdAt_billableJob}}\\\"] } }]}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billablejobs/find",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billablejobs",
+								"find"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BillableOrders",
+			"item": [
+				{
+					"name": "Returns information about specified billable order.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c68c9a7c-12d9-4a74-ae98-409b88366b5c",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Check order\"] = jsonData.id === pm.environment.get(\"NewOrderID_billable\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billableorders/{{NewOrderID_billable}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billableorders",
+								"{{NewOrderID_billable}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Manually triggers creation/update of sales order in SAP system.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0c40a5a-d72f-4b42-814e-a959c28e0efb",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" //var jsonData = JSON.parse(responseBody);",
+									" //tests[\"Check order\"] = jsonData.id === pm.environment.get(\"NewOrderID_billable\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billableorders/{{NewOrderID_billable}}/manualsalesupdate",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billableorders",
+								"{{NewOrderID_billable}}",
+								"manualsalesupdate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query on billable orders.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "48d7e911-9ee7-49f7-8645-c7a875a83542",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //pm.environment.set(\"NewJobID_billable\", jsonData[0].id);",
+									" //tests[\"Check job\"] = jsonData.results[0].id === pm.environment.get(\"NewJobID_billable\");",
+									" tests[\"Check order\"] = jsonData.results[0].id === pm.environment.get(\"NewOrderID_billable\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 500,\r\n  \"query\": \"{\\\"bool\\\": {\\\"must\\\" : [{\\\"terms\\\" : {\\\"id\\\" : [\\\"{{NewOrderID_billable}}\\\"] } }]}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billableorders/find",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billableorders",
+								"find"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BillingModels",
+			"item": [
+				{
+					"name": "Creates a new billing model.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1a2e67f7-a93f-4ed5-b0d8-1180e7e946d4",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" var billingModel = pm.environment.get(\"BillingModel\");",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData)",
+									" pm.environment.set(\"NewBillingModel_id\", jsonData);",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4b05948c-6751-404a-9524-222e80b0ca1e",
+								"exec": [
+									"pm.environment.set(\"CustomerID\", \"e3b59a42\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"{{CustomerID}}\",\r\n  \"billingModelType\": \"{{BillingModel}}\",\r\n  \"validFrom\": \"2019-05-03T10:09:09.663Z\",\r\n  \"validTo\": \"2019-05-03T10:09:09.663Z\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns specified billing model.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb737989-3290-4d2d-a1d7-6e2a426f7c6f",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //var billingModel = pm.environment.get(\"BillingModel\");",
+									" var jsonData = JSON.parse(responseBody);",
+									" //pm.environment.set(\"NewBillingModel_id\", jsonData.value);",
+									" tests[\"Check id\"] = jsonData.id === pm.environment.get(\"NewBillingModel_id\");",
+									" tests[\"BillingModelType matches NON_SUBSCRIPTION\"] = pm.environment.get(\"BillingModel\") === jsonData.billingModelType;",
+									" tests[\"Check customerId\"] = jsonData.customerId === pm.environment.get(\"CustomerID\");",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3d53b756-7c18-4118-913b-b67d3cec5970",
+								"exec": [
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 3000);//wait 5 sec",
+									"console.log(\"Waiting Finished\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels/{{NewBillingModel_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels",
+								"{{NewBillingModel_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query on billing models.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "165d9549-0725-4349-ad72-c9d263ddea7a",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" //pm.environment.set(\"NewJobID_billable\", jsonData[0].id);",
+									" tests[\"Check id\"] = jsonData.results[0].id === pm.environment.get(\"NewBillingModel_id\");",
+									" tests[\"BillingModelType matches NON_SUBSCRIPTION\"] = pm.environment.get(\"BillingModel\") === jsonData.results[0].billingModelType;",
+									" tests[\"Check customerId\"] = jsonData.results[0].customerId === pm.environment.get(\"CustomerID\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 10,\r\n  \"query\": \"{\\\"bool\\\": {\\\"must\\\" : [{\\\"terms\\\" : {\\\"id\\\" : [\\\"{{NewBillingModel_id}}\\\"] } }]}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels/find",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Updates validity dates for specified billing model.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6ee51cc8-9415-4f93-9fce-2438f5b645a7",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"validFrom\": \"{{AvailabilityStart}}\",\r\n  \"validTo\": \"{{AvailabilityEnd}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels/{{NewBillingModel_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels",
+								"{{NewBillingModel_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns specified billing model. Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb737989-3290-4d2d-a1d7-6e2a426f7c6f",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //var billingModel = pm.environment.get(\"BillingModel\");",
+									" var jsonData = JSON.parse(responseBody);",
+									" //pm.environment.set(\"NewBillingModel_id\", jsonData.value);",
+									" tests[\"Check id\"] = jsonData.id === pm.environment.get(\"NewBillingModel_id\");",
+									" tests[\"BillingModelType matches NON_SUBSCRIPTION\"] = pm.environment.get(\"BillingModel\") === jsonData.billingModelType;",
+									" tests[\"Check customerId\"] = jsonData.customerId === pm.environment.get(\"CustomerID\");",
+									" ",
+									" tests[\"Check validFrom\"] = jsonData.validFrom === pm.environment.get(\"AvailabilityStart\");",
+									" tests[\"Check validTo\"] = jsonData.validTo === pm.environment.get(\"AvailabilityEnd\");",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels/{{NewBillingModel_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels",
+								"{{NewBillingModel_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deleted specified billing model.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "77fcc900-771c-4e15-a6aa-6c2c46f4c336",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels/{{NewBillingModel_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels",
+								"{{NewBillingModel_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns specified billing model. Copy Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb737989-3290-4d2d-a1d7-6e2a426f7c6f",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e30cde9f-f22c-42f2-af63-fbf56186630b",
+								"exec": [
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/billingModels/{{NewBillingModel_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"billingModels",
+								"{{NewBillingModel_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MaterialCodes",
+			"item": [
+				{
+					"name": "Creates a new material code.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "368abaa6-5294-40b1-9c03-761db83d191e",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 201;",
+									"//Check each property",
+									"if (responseCode.code === 201)",
+									"{",
+									" var billingModel = pm.environment.get(\"BillingModel\");",
+									" var jsonData = JSON.parse(responseBody);",
+									" //console.log(jsonData)",
+									" pm.environment.set(\"NewMaterialCode_id\", jsonData);",
+									" //tests[\"Body matches NON_SUBSCRIPTION\"] = responseBody.has(\"NON_SUBSCRIPTION\");",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"materialCode\": \"4000024567\",\r\n  \"materialCodeName\": \"4000024567 ANCILLARY\",\r\n  \"effectiveDate\": \"2019-05-03T10:50:33.224Z\",\r\n  \"jobLineType\": \"{{JobLineType}}\",\r\n  \"billingModelType\": \"{{BillingModel}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns specified material code.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1c188925-ef0c-4aee-8959-80cda4d45c57",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"NewMaterialCode_id\", jsonData.id);",
+									" tests[\"Check id\"] = jsonData.id === pm.environment.get(\"NewMaterialCode_id\");",
+									" tests[\"Check materialCode\"] = jsonData.materialCode === \"4000024567\";",
+									" tests[\"Check name\"] = jsonData.name === \"4000024567 ANCILLARY\";",
+									" tests[\"Check billingModelType\"] = jsonData.billingModelType === pm.environment.get(\"BillingModel\");",
+									" tests[\"Check jobLineType\"] = jsonData.jobLineType === pm.environment.get(\"JobLineType\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fba5b863-8fe6-449a-9233-6f43df54bcb0",
+								"exec": [
+									"console.log(\"Waiting Started\");",
+									"setTimeout(function() {}, 3000);//wait 5 sec",
+									"console.log(\"Waiting Finished\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes/{{NewMaterialCode_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes",
+								"{{NewMaterialCode_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Updates validity dates for specified Material Code.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cd087a05-4a5a-4a48-a06a-fc2d830492b2",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{NewMaterialCode_id}}\",\r\n  \"materialCode\": \"4000024564\",\r\n  \"materialCodeName\": \"4000024564 VIDEO\",\r\n  \"effectiveDate\": \"2019-05-03T11:01:33.032Z\",\r\n  \"jobLineType\": \"{{JobLineType}}\",\r\n  \"billingModelType\": \"{{BillingModel}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns specified material code. Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "38308b7f-9337-4442-95ef-e98870b405bd",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" pm.environment.set(\"NewMaterialCode_id\", jsonData.id);",
+									" tests[\"Check id\"] = jsonData.id === pm.environment.get(\"NewMaterialCode_id\");",
+									" tests[\"Check materialCode\"] = jsonData.materialCode === \"4000024564\";",
+									" tests[\"Check name\"] = jsonData.name === \"4000024564 VIDEO\";",
+									" tests[\"Check billingModelType\"] = jsonData.billingModelType === pm.environment.get(\"BillingModel\");",
+									" tests[\"Check jobLineType\"] = jsonData.jobLineType === pm.environment.get(\"JobLineType\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes/{{NewMaterialCode_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes",
+								"{{NewMaterialCode_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query on Material Codes.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b7a95f02-c573-412c-bffb-553e25f1b1f5",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"//Check each property",
+									"if (responseCode.code === 200)",
+									"{",
+									" //console.log(\"Response: \"+responseBody);   ",
+									" var jsonData = JSON.parse(responseBody);",
+									" tests[\"Check id\"] = jsonData.results[0].id === pm.environment.get(\"NewMaterialCode_id\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"pageIndex\": 0,\r\n  \"pageSize\": 500,\r\n  \"query\": \"{\\\"bool\\\": {\\\"must\\\" : [{\\\"terms\\\" : {\\\"id\\\" : [\\\"{{NewMaterialCode_id}}\\\"] } }]}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes/find",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deleted specified material code.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "64beef5a-f0c4-4e04-8ba6-68d0b3fd3b84",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes/{{NewMaterialCode_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes",
+								"{{NewMaterialCode_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns specified material code. Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "864933ae-48c2-49cc-8b22-3a6500dd0482",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/materialCodes/{{NewMaterialCode_id}}",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"materialCodes",
+								"{{NewMaterialCode_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SapDocuments",
+			"item": [
+				{
+					"name": "Creates invoice billing document.",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"systemId\": \"string\",\r\n  \"invoiceId\": \"string\",\r\n  \"invoiceDate\": \"2019-05-03T11:08:08.456Z\",\r\n  \"items\": [\r\n    {\r\n      \"obdNumber\": \"string\",\r\n      \"itemNumber\": \"string\"\r\n    }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/sapdocuments/invoice",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"sapdocuments",
+								"invoice"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Creates Credit Memo billing document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"systemId\": \"string\",\r\n  \"creditMemoId\": \"string\",\r\n  \"creditMemoDate\": \"2019-05-03T11:08:33.754Z\",\r\n  \"items\": [\r\n    {\r\n      \"obdNumber\": \"string\",\r\n      \"itemNumber\": \"string\"\r\n    }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/sapdocuments/creditmemo",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"sapdocuments",
+								"creditmemo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Returns billing document with given Id.",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/sapdocuments/:id",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"sapdocuments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query on billing documents.",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "Billing documents pages search"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/sapdocuments/find",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"sapdocuments",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Performs search query on billing documents. Copy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain, application/json, text/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "Billing documents pages search"
+						},
+						"url": {
+							"raw": "{{BillingAPIHost}}/v1/sapdocuments/find",
+							"host": [
+								"{{BillingAPIHost}}"
+							],
+							"path": [
+								"v1",
+								"sapdocuments",
+								"find"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
