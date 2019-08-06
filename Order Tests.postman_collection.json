@@ -1073,6 +1073,7 @@
 									"sum += jsonData.AWAITING_SOURCES;",
 									"sum += jsonData.COMPLETED;",
 									"sum += jsonData.IN_PROGRESS;",
+									"sum += jsonData.RECEIVED;",
 									"var checksum = pm.environment.get(\"Statistic_TotalJobs\");",
 									"pm.environment.set(\"Statistic_Statuses\", jsonData);",
 									"tests[\"Checksum test\"] = sum == checksum;",
